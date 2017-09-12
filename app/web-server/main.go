@@ -3,13 +3,19 @@ package main
 import (
 	"net/http"
 
-	"github.com/bukalapak/go-xample/handler"
 	"github.com/julienschmidt/httprouter"
+
+  gx "github.com/bukalapak/go-xample"
+  "github.com/bukalapak/go-xample/handler"
 )
 
 func main() {
+  gX := gx.NewGoXample()
+  gxHandler := handler.NewHandler(gX)
+
 	router := httprouter.New()
-	router.HandlerFunc("GET", "/healthz", handler.Healthz)
-	router.HandlerFunc("GET", "/metrics", handler.Metric)
+	router.GET("/healthz", gxHandler.Healthz)
+	router.GET("/metrics", gxHandler.Metric)
+  router.POST("/users", gxHandler.CreateUser)
 	http.ListenAndServe(":1234", router)
 }
