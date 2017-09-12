@@ -2,16 +2,44 @@ package handler
 
 import (
 	"fmt"
+  "io/ioutil"
 	"net/http"
 
+  "github.com/julienschmidt/httprouter"
 	"github.com/bukalapak/packen/metric"
+
+  gx "github.com/bukalapak/go-xample"
 )
 
-func Healthz(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+  Gx gx.GoXample
+}
+
+func NewHandler(goXample gx.GoXample) Handler {
+  return Handler{
+    Gx: goXample,
+  }
+}
+
+func (h *Handler) Healthz(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, "ok")
 }
 
-func Metric(w http.ResponseWriter, r *http.Request) {
+func(h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	metric.Handler(w, r)
+}
+
+func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+  // preare
+  body, err := ioutil.ReadAll(r.Body)
+  if err != nil {
+    return
+  }
+
+  _, err = h.Gx.CreateUser(string(body))
+  if err != nil {
+    return
+  }
+  // write response
 }
