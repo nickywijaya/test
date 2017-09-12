@@ -8,6 +8,11 @@ type GoXample struct {
   // DB
 }
 
+type User struct {
+  Name string `json:"name"`
+  password string `json:"password"`
+}
+
 func NewGoXample() GoXample {
   return GoXample{}
 }
