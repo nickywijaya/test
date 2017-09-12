@@ -2,23 +2,23 @@ package handler
 
 import (
 	"fmt"
-  "io/ioutil"
+	"io/ioutil"
 	"net/http"
 
-  "github.com/julienschmidt/httprouter"
 	"github.com/bukalapak/packen/metric"
+	"github.com/julienschmidt/httprouter"
 
-  gx "github.com/bukalapak/go-xample"
+	gx "github.com/bukalapak/go-xample"
 )
 
 type Handler struct {
-  Gx gx.GoXample
+	Gx gx.GoXample
 }
 
 func NewHandler(goXample gx.GoXample) Handler {
-  return Handler{
-    Gx: goXample,
-  }
+	return Handler{
+		Gx: goXample,
+	}
 }
 
 func (h *Handler) Healthz(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -26,20 +26,20 @@ func (h *Handler) Healthz(w http.ResponseWriter, r *http.Request, params httprou
 	fmt.Fprintln(w, "ok")
 }
 
-func(h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	metric.Handler(w, r)
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-  // preare
-  body, err := ioutil.ReadAll(r.Body)
-  if err != nil {
-    return
-  }
+	// preare
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
 
-  _, err = h.Gx.CreateUser(string(body))
-  if err != nil {
-    return
-  }
-  // write response
+	_, err = h.Gx.CreateUser(string(body))
+	if err != nil {
+		return
+	}
+	// write response
 }
