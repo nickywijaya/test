@@ -21,5 +21,7 @@ func main() {
 	router.POST("/users", middleware.MonitorHTTP("create-user", gxHandler.CreateUser))
 	router.GET("/users/:id", middleware.MonitorHTTP("get-user", gxHandler.GetUser))
 
+	router.POST("/login", middleware.MonitorHTTP("login", gxHandler.Login))
+
 	http.ListenAndServe(":1234", router)
 }

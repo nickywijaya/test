@@ -29,7 +29,19 @@ func (g *GoXample) CreateUser(data string) (User, error) {
 	return user, nil
 }
 
-func (g *GoXample) GetUser(id int) (User, error) {
+func (g *GoXample) GetUserByID(id int) (User, error) {
 	user := User{ID: id}
+	return user, nil
+}
+
+func (g *GoXample) GetUserByCredential(data string) (User, error) {
+	var user User
+
+	err := json.Unmarshal([]byte(data), &user)
+	if err != nil {
+		return User{}, err
+	}
+
+	// TODO: get from DB
 	return user, nil
 }

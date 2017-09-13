@@ -60,7 +60,24 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request, params httprou
 		return err
 	}
 
-	user, err := h.Gx.GetUser(userID)
+	user, err := h.Gx.GetUserByID(userID)
+	if err != nil {
+		writeError(w, err)
+		return err
+	}
+
+	writeSuccess(w, user)
+	return nil
+}
+
+func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writeError(w, err)
+		return err
+	}
+
+	user, err := h.Gx.GetUserByCredential(string(body))
 	if err != nil {
 		writeError(w, err)
 		return err
