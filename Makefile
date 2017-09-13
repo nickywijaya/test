@@ -4,6 +4,6 @@ dep:
 	govendor sync
 
 pretty:
-	gofmt -w **/**/*.go
-	gofmt -w **/*.go
+	# gofmt -d -w $$(find . -type f -name '*.go' -not -path "./vendor/*")
+	goimports -d -w $$(find . -type f -name '*.go' -not -path "./vendor/*")
 	go tool vet .
