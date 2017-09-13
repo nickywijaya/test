@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bukalapak/packen/metric"
+	"github.com/bukalapak/packen/response"
 	"github.com/julienschmidt/httprouter"
 
 	gx "github.com/bukalapak/go-xample"
@@ -13,6 +14,10 @@ import (
 
 type Handler struct {
 	Gx gx.GoXample
+}
+
+type Meta struct {
+	HTTPStatus int `json:"http_status"`
 }
 
 func NewHandler(goXample gx.GoXample) Handler {
@@ -31,15 +36,22 @@ func (h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprout
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	// preare
+	// TODO: prepare context
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		res := response.BuildError([]error{err})
+		response.Write(w, res)
 		return
 	}
 
-	_, err = h.Gx.CreateUser(string(body))
+	user, err := h.Gx.CreateUser(string(body))
 	if err != nil {
+		res := response.BuildError([]error{err})
+		response.Write(w, res)
 		return
 	}
-	// write response
+
+	res := response.BuildSuccess(user, Meta{HTTPStatus: 200})
+	response.Write(w, res)
 }

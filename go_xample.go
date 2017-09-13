@@ -1,29 +1,29 @@
 package go_xample
 
 import (
-  "encoding/json"
+	"encoding/json"
 )
 
 type GoXample struct {
-  // DB
+	// DB
 }
 
 type User struct {
-  Name string `json:"name"`
-  password string `json:"password"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 func NewGoXample() GoXample {
-  return GoXample{}
+	return GoXample{}
 }
 
 func (g *GoXample) CreateUser(data string) (User, error) {
-  var user User
+	var user User
 
-  err := json.Unmarshal([]byte(data), &user)
-  if err != nil {
-    return User{}, err
-  }
+	err := json.Unmarshal([]byte(data), &user)
+	if err != nil {
+		return User{}, err
+	}
 
-  return user, nil
+	return user, nil
 }
