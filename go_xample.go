@@ -9,8 +9,9 @@ type GoXample struct {
 }
 
 type User struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	ID       int    `json:"id"`
+	Name     string `json:"name, omitempty"`
+	Password string `json:"password, omitempty"`
 }
 
 func NewGoXample() GoXample {
@@ -25,5 +26,10 @@ func (g *GoXample) CreateUser(data string) (User, error) {
 		return User{}, err
 	}
 
+	return user, nil
+}
+
+func (g *GoXample) GetUser(id int) (User, error) {
+	user := User{ID: id}
 	return user, nil
 }

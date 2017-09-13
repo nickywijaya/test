@@ -17,6 +17,9 @@ func main() {
 	router := httprouter.New()
 	router.GET("/healthz", gxHandler.Healthz)
 	router.GET("/metrics", gxHandler.Metric)
+
 	router.POST("/users", middleware.MonitorHTTP("create-user", gxHandler.CreateUser))
+	router.GET("/users/:id", middleware.MonitorHTTP("get-user", gxHandler.GetUser))
+
 	http.ListenAndServe(":1234", router)
 }
