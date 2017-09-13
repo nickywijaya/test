@@ -15,6 +15,12 @@
 			"revisionTime": "2017-09-13T06:04:49Z"
 		},
 		{
+			"checksumSHA1": "FMjzEYyTAq53cbYOsHGrbjG1SI4=",
+			"path": "github.com/bukalapak/packen/middleware",
+			"revision": "dc7e76d834bd216d9b0abdeaced48cc42befcf17",
+			"revisionTime": "2017-09-13T06:04:49Z"
+		},
+		{
 			"checksumSHA1": "zBuE9a5Pbxz2gI+WQNwMIm4rmhE=",
 			"path": "github.com/bukalapak/packen/response",
 			"revision": "dc7e76d834bd216d9b0abdeaced48cc42befcf17",
@@ -85,6 +91,12 @@
 			"path": "github.com/prometheus/procfs/xfs",
 			"revision": "a1dba9ce8baed984a2495b658c82687f8157b98f",
 			"revisionTime": "2017-02-16T22:32:56Z"
+		},
+		{
+			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
+			"revisionTime": "2017-03-21T23:07:31Z"
 		}
 	],
 	"rootPath": "github.com/bukalapak/go-xample"

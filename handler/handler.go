@@ -35,23 +35,22 @@ func (h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprout
 	metric.Handler(w, r)
 }
 
-func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	// TODO: prepare context
-
+func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		res := response.BuildError([]error{err})
 		response.Write(w, res)
-		return
+		return err
 	}
 
 	user, err := h.Gx.CreateUser(string(body))
 	if err != nil {
 		res := response.BuildError([]error{err})
 		response.Write(w, res)
-		return
+		return err
 	}
 
 	res := response.BuildSuccess(user, Meta{HTTPStatus: 200})
 	response.Write(w, res)
+	return nil
 }
