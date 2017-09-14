@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -37,13 +38,20 @@ func (h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprout
 }
 
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return errors.New("Timeout")
+	default:
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		writeError(w, err)
 		return err
 	}
 
-	user, err := h.Gx.CreateUser(string(body))
+	user, err := h.Gx.CreateUser(ctx, string(body))
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -54,13 +62,20 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params http
 }
 
 func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return errors.New("Timeout")
+	default:
+	}
+
 	userID, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		writeError(w, err)
 		return err
 	}
 
-	user, err := h.Gx.GetUserByID(userID)
+	user, err := h.Gx.GetUserByID(ctx, userID)
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -71,13 +86,20 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request, params httprou
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return errors.New("Timeout")
+	default:
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		writeError(w, err)
 		return err
 	}
 
-	user, err := h.Gx.GetUserByCredential(string(body))
+	user, err := h.Gx.GetUserByCredential(ctx, string(body))
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -88,8 +110,8 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	res := response.BuildError([]error{err})
-	response.Write(w, res)
+	// res := response.BuildError([]error{err})
+	response.Write(w, err)
 }
 
 func writeSuccess(w http.ResponseWriter, data interface{}) {
