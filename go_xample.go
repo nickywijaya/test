@@ -49,7 +49,17 @@ func (g *GoXample) CreateUser(ctx context.Context, data string) (User, error) {
 }
 
 func (g *GoXample) GetUserByID(ctx context.Context, id int) (User, error) {
-	user := User{ID: id}
+	select {
+	case <-ctx.Done():
+		return User{}, errors.New("Timeout")
+	default:
+	}
+
+	user, err := g.db.FindUserByID(ctx, id)
+	if err != nil {
+		return User{}, err
+	}
+
 	return user, nil
 }
 

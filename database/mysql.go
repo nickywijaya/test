@@ -33,17 +33,6 @@ func NewMySQL(opt Option) (MySQL, error) {
 	return MySQL{db: db}, nil
 }
 
-func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
-	var user gx.User
-
-	err := m.db.QueryRow("SELECT * FROM users WHERE id=?").Scan(&user)
-	if err != nil {
-		return gx.User{}, err
-	}
-
-	return user, nil
-}
-
 func (m MySQL) InsertUser(ctx context.Context, user gx.User) error {
 	select {
 	case <-ctx.Done():
@@ -53,4 +42,15 @@ func (m MySQL) InsertUser(ctx context.Context, user gx.User) error {
 
 	_, err := m.db.Exec("INSERT INTO users(username, name, password) VALUES(?, ?, ?)", user.Name, user.Username, user.Password)
 	return err
+}
+
+func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
+	var user gx.User
+
+	err := m.db.QueryRow("SELECT id, name, username, password FROM users WHERE id = ?", id).Scan(&user.ID, &user.Name, &user.Username, &user.Password)
+	if err != nil {
+		return gx.User{}, err
+	}
+
+	return user, nil
 }
