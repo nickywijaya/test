@@ -19,8 +19,10 @@ type DBInterface interface {
 type User struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name, omitempty"`
-	Username string `json:"username, omitempty"`
-	Password string `json:"password, omitempty"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Active   bool   `json:"active"`
 }
 
 func NewGoXample(db DBInterface) GoXample {
