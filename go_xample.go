@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"time"
 )
 
 type GoXample struct {
@@ -14,6 +15,7 @@ type DBInterface interface {
 	InsertUser(context.Context, User) error
 	FindUserByID(context.Context, int) (User, error)
 	FindUserByCredential(context.Context, User) (User, error)
+	InsertLoginHistory(context.Context, User, time.Time) error
 }
 
 type User struct {
@@ -79,5 +81,12 @@ func (g *GoXample) GetUserByCredential(ctx context.Context, data string) (User, 
 		return User{}, err
 	}
 
+	go g.updateLoginHistory(ctx, user)
+
 	return user, nil
+}
+
+func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
+	loginAt := time.Now()
+	return g.db.InsertLoginHistory(ctx, user, loginAt)
 }
