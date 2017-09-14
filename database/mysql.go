@@ -48,7 +48,7 @@ func (m MySQL) InsertUser(ctx context.Context, user gx.User) error {
 func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 	var user gx.User
 
-	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE id = ?", id).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
+	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active=true AND id=?", id).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
 	if err != nil {
 		return gx.User{}, err
 	}
@@ -59,7 +59,7 @@ func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 func (m MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User, error) {
 	var user gx.User
 
-	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE username = ? AND password = ?", cred.Username, cred.Password).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
+	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active=true AND username=? AND password=?", cred.Username, cred.Password).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
 	if err != nil {
 		return gx.User{}, err
 	}
