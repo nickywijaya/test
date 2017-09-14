@@ -54,3 +54,14 @@ func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 
 	return user, nil
 }
+
+func (m MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User, error) {
+	var user gx.User
+
+	err := m.db.QueryRow("SELECT id, name, username, password FROM users WHERE username = ? AND password = ?", cred.Username, cred.Password).Scan(&user.ID, &user.Name, &user.Username, &user.Password)
+	if err != nil {
+		return gx.User{}, err
+	}
+
+	return user, nil
+}

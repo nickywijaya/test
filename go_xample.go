@@ -11,8 +11,9 @@ type GoXample struct {
 }
 
 type DBInterface interface {
-	FindUserByID(context.Context, int) (User, error)
 	InsertUser(context.Context, User) error
+	FindUserByID(context.Context, int) (User, error)
+	FindUserByCredential(context.Context, User) (User, error)
 }
 
 type User struct {
@@ -71,6 +72,10 @@ func (g *GoXample) GetUserByCredential(ctx context.Context, data string) (User, 
 		return User{}, err
 	}
 
-	// TODO: get from DB
+	user, err = g.db.FindUserByCredential(ctx, user)
+	if err != nil {
+		return User{}, err
+	}
+
 	return user, nil
 }
