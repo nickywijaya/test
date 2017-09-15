@@ -1,0 +1,68 @@
+projectName: go-xample
+services:
+- name: 'http-go-xample'
+  port: "1234"
+  environments:
+  - name: production
+    replica: "1"
+  - name: canary
+    replica: "1"
+  - name: sandbox
+    replica: "1"
+  - name: beta
+    replica: "1"
+  nodePort: "31234"
+  healthz: healthz
+  maxMem: ""
+  maxCpu: ""
+  minMem: ""
+  minCpu: ""
+  limit: false
+  timeout: "1"
+  delay: "30"
+  language: go
+  consul: envconsul
+- name: 'background-go-xample'
+  port: "1235"
+  environments:
+  - name: production
+    replica: "1"
+  - name: canary
+    replica: "1"
+  - name: sandbox
+    replica: "1"
+  - name: beta
+    replica: "1"
+  nodePort: "31235"
+  healthz: healthz
+  maxMem: ""
+  maxCpu: ""
+  minMem: ""
+  minCpu: ""
+  limit: false
+  timeout: "1"
+  delay: "30"
+  language: go
+  consul: envconsul
+- name: 'cron-go-xample'
+  port: "1236"
+  environments:
+  - name: production
+    replica: "1"
+  - name: canary
+    replica: "1"
+  - name: sandbox
+    replica: "1"
+  - name: beta
+    replica: "1"
+  nodePort: "31236"
+  healthz: healthz
+  maxMem: ""
+  maxCpu: ""
+  minMem: ""
+  minCpu: ""
+  limit: false
+  timeout: "1"
+  delay: "30"
+  language: go
+  consul: envconsul

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: background-go-xample-{{.CurrentEnvironment}}
+spec:
+  selector:
+    app: background-go-xample
+    env: {{.CurrentEnvironment}}
+  ports:
+    - protocol: TCP
+      port: 1235
+      targetPort: 1235
+      nodePort: {{.NodePort}}
+  type: NodePort

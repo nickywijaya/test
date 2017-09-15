@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cron-go-xample-{{.CurrentEnvironment}}
+spec:
+  selector:
+    app: cron-go-xample
+    env: {{.CurrentEnvironment}}
+  ports:
+    - protocol: TCP
+      port: 1236
+      targetPort: 1236
+      nodePort: {{.NodePort}}
+  type: NodePort

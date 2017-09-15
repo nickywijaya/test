@@ -1,0 +1,76 @@
+image: registry.bukalapak.io/bukalapak/kubernetes:latest
+
+stages:
+  - test
+  - build-docker
+  - replace-sandbox
+  - create-sandbox
+  - replace-production
+  - create-production
+
+test:
+  stage: test
+  image: golang:1.8.1
+  services:
+    - memcached
+    - redis
+  variables:
+    GOPATH: "/go_project"
+  before_script:
+    - mkdir /go_project
+    - mkdir -p $GOPATH/src/github.com/$CI_PROJECT_PATH
+    - go get -u github.com/kardianos/govendor
+    - go get -u github.com/mjibson/esc
+    - cp /go_project/bin/* /usr/local/bin/
+    - cp -Rp $CI_PROJECT_DIR/* $GOPATH/src/github.com/$CI_PROJECT_PATH
+    - cd $GOPATH/src/github.com/$CI_PROJECT_PATH
+  script:
+    - make gen
+    - make coverage
+
+build-docker:
+  stage: build-docker
+  image: trihatmaja/dind:17.04-ruby2.3
+  variables:
+    DOCKER_HOST: 172.16.8.88:2375
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - apk update && apk add git
+  script:
+    - rake aleppo:all
+  artifacts:
+    paths:
+    - $CI_PROJECT_DIR/deploy/_outputs/
+
+replace-sandbox:
+  stage: replace-sandbox
+  script:
+    - kubectl replace -f deploy/_outputs/sandbox/aleppo-deployment-sandbox.yml --namespace default
+  dependencies:
+    - build-docker
+  when: manual
+
+create-sandbox:
+  stage: create-sandbox
+  image: 
+  script:
+    - kubectl create -f deploy/_outputs/sandbox/aleppo-deployment-sandbox.yml --namespace default
+  dependencies:
+    - build-docker
+  when: manual
+  
+replace-production:
+  stage: replace-production
+  script:
+    - kubectl create -f deploy/_outputs/production/aleppo-deployment-production.yml --namespace default
+  dependencies:
+    - build-docker
+  when: manual
+ 
+create-production:
+  stage: create-production
+  script:
+    - kubectl replace -f deploy/_outputs/production/aleppo-deployment-production.yml --namespace default
+  dependencies:
+    - build-docker
+  when: manual

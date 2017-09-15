@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: http-go-xample-{{.CurrentEnvironment}}
+spec:
+  replicas: {{.CurrentReplica}}
+  selector:
+    matchLabels:
+      app: http-go-xample
+      env: {{.CurrentEnvironment}}
+  template:
+    metadata:
+      labels:
+        app: http-go-xample
+        env: {{.CurrentEnvironment}}
+        release: '{{.Version}}'
+    spec:
+      imagePullSecrets:
+      - name: blregistry
+      containers:
+      - name: http-go-xample
+        image: registry.bukalapak.io/bukalapak/go-xample/http-go-xample:{{.Version}}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 1234
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 1234
+          timeoutSeconds: 1
+        ports:
+        - containerPort: 1234
+        command:
+          - /envconsul
+          - -consul=127.0.0.1:8500
+          - -sanitize
+          - -upcase
+          - -prefix=http-go-xample
+          - /http-go-xample
+      - name: consul
+        image: registry.bukalapak.io/bukalapak/consul-image:0.0.10
+        env:
+        - name: SERVICE_NAME
+          value: http-go-xample
+        - name: SERVICE_ENVIRONMENT
+          value: {{.CurrentEnvironment}}
+        - name: SERVICE_PORT
+          value: "1234"
+        - name: SERVICE_MONITORING_PORT
+          value: "1234"
+        - name: CONSUL1
+          valueFrom:
+            configMapKeyRef:
+              name: consul-config
+              key: node1
+        - name: CONSUL2
+          valueFrom:
+            configMapKeyRef:
+              name: consul-config
+              key: node2
+        - name: CONSUL3
+          valueFrom:
+            configMapKeyRef:
+              name: consul-config
+              key: node3
+        - name: CONSUL_ENCRYPT
+          valueFrom:
+            configMapKeyRef:
+              name: consul-config
+              key: encrypt
+        ports:
+        - containerPort: 8300
+        - containerPort: 8301
+        - containerPort: 8302
+        - containerPort: 8400
+        - containerPort: 8500
+        - containerPort: 8600
+        command: ["/bin/entrypoint", "agent", "-config-dir=/config", "-join=$(CONSUL1)", "-join=$(CONSUL2)", "-join=$(CONSUL3)", "-encrypt=$(CONSUL_ENCRYPT)"]
+      nodeSelector:
+        env: {{.CurrentEnvironment}}

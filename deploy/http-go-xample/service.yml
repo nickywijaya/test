@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-go-xample-{{.CurrentEnvironment}}
+spec:
+  selector:
+    app: http-go-xample
+    env: {{.CurrentEnvironment}}
+  ports:
+    - protocol: TCP
+      port: 1234
+      targetPort: 1234
+      nodePort: {{.NodePort}}
+  type: NodePort
