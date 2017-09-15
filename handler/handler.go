@@ -109,6 +109,18 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 	return nil
 }
 
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
+	ctx := r.Context()
+	select {
+	case <-ctx.Done():
+		return errors.New("Timeout")
+	default:
+	}
+
+	writeSuccess(w, "You've been successfully logout!")
+	return nil
+}
+
 func writeError(w http.ResponseWriter, err error) {
 	// res := response.BuildError([]error{err})
 	response.Write(w, err)

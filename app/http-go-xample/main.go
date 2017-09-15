@@ -37,6 +37,7 @@ func main() {
 	router.GET("/users/:id", middleware.MonitorHTTP("get-user", gxHandler.GetUser))
 
 	router.POST("/login", middleware.MonitorHTTP("login", gxHandler.Login))
+	router.GET("/logout", middleware.MonitorHTTP("logout", gxHandler.Logout))
 
 	http.ListenAndServe(":1234", router)
 }
