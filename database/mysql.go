@@ -25,16 +25,16 @@ type Option struct {
 	Charset  string
 }
 
-func NewMySQL(opt Option) (MySQL, error) {
+func NewMySQL(opt Option) (*MySQL, error) {
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s", opt.User, opt.Password, opt.Host, opt.Port, opt.Database, opt.Charset))
 	if err != nil {
-		return MySQL{}, err
+		return &MySQL{}, err
 	}
 
-	return MySQL{db: db}, nil
+	return &MySQL{db: db}, nil
 }
 
-func (m MySQL) InsertUser(ctx context.Context, user gx.User) error {
+func (m *MySQL) InsertUser(ctx context.Context, user gx.User) error {
 	select {
 	case <-ctx.Done():
 		return errors.New("Timeout")
@@ -45,7 +45,7 @@ func (m MySQL) InsertUser(ctx context.Context, user gx.User) error {
 	return err
 }
 
-func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
+func (m *MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 	var user gx.User
 
 	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active=true AND id=?", id).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
@@ -56,7 +56,7 @@ func (m MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 	return user, nil
 }
 
-func (m MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User, error) {
+func (m *MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User, error) {
 	var user gx.User
 
 	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active=true AND username=? AND password=?", cred.Username, cred.Password).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
@@ -67,7 +67,7 @@ func (m MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User,
 	return user, nil
 }
 
-func (m MySQL) InsertLoginHistory(ctx context.Context, user gx.User, loginAt time.Time) error {
+func (m *MySQL) InsertLoginHistory(ctx context.Context, user gx.User, loginAt time.Time) error {
 	_, err := m.db.Exec("INSERT INTO login_histories (username, login_at) VALUES(?, ?)", user.Username, loginAt)
 	return err
 }
