@@ -32,6 +32,11 @@ type User struct {
 	Active   bool   `json:"active"`
 }
 
+type LoginHistory struct {
+	Username string    `json:"username"`
+	LoginAt  time.Time `json:"login_at"`
+}
+
 func NewGoXample(db DBInterface, msgr MessengerInterface) GoXample {
 	return GoXample{
 		db:        db,
@@ -95,6 +100,15 @@ func (g *GoXample) GetUserByCredential(ctx context.Context, data string) (User, 
 }
 
 func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
-	// loginAt := time.Now()
-	return g.messenger.Publish("application/json", []byte("loginAt"))
+	loginHistory := LoginHistory{
+		Username: user.Username,
+		LoginAt:  time.Now(),
+	}
+
+	data, err := json.Marshal(loginHistory)
+	if err != nil {
+		return err
+	}
+
+	return g.messenger.Publish("application/json", data)
 }
