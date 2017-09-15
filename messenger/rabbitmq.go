@@ -10,6 +10,7 @@ type RabbitMQ struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
 	Queue      amqp.Queue
+	Inbox      <-chan amqp.Delivery
 	option     RabbitMQOption
 }
 
@@ -87,13 +88,28 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 		return &RabbitMQ{}, err
 	}
 
-	pub := &RabbitMQ{
+	// init consumer
+	inbox, err := channel.Consume(
+		queue.Name,
+		"",            // consumer
+		false,         // auto-ack
+		opt.Exclusive, // exclusive
+		false,         // no-local
+		false,         // no-wait
+		nil,           // args
+	)
+	if err != nil {
+		return &RabbitMQ{}, err
+	}
+
+	rmq := &RabbitMQ{
 		Connection: conn,
 		Channel:    channel,
 		Queue:      queue,
+		Inbox:      inbox,
 		option:     opt,
 	}
-	return pub, nil
+	return rmq, nil
 }
 
 func (r *RabbitMQ) Publish(contentType string, data []byte) error {
@@ -109,4 +125,7 @@ func (r *RabbitMQ) Publish(contentType string, data []byte) error {
 	)
 
 	return err
+}
+
+func (r *RabbitMQ) Receive() {
 }
