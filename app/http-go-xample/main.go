@@ -11,6 +11,7 @@ import (
 	gx "github.com/bukalapak/go-xample"
 	"github.com/bukalapak/go-xample/database"
 	"github.com/bukalapak/go-xample/handler"
+	"github.com/bukalapak/go-xample/messenger"
 )
 
 func main() {
@@ -25,8 +26,21 @@ func main() {
 		Charset:  os.Getenv("MYSQL_CHARSET"),
 	}
 
+	rmqOpt := messenger.RabbitMQOption{
+		Username:     os.Getenv("RABBITMQ_USER"),
+		Password:     os.Getenv("RABBITMQ_PASSWORD"),
+		Host:         os.Getenv("RABBITMQ_HOST"),
+		VHost:        os.Getenv("RABBITMQ_VHOST"),
+		ExchangeName: os.Getenv("RABBITMQ_EXCHANGE_NAME"),
+		ExchangeType: os.Getenv("RABBITMQ_EXCHANGE_TYPE"),
+		RoutingKey:   os.Getenv("RABBITMQ_ROUTING_KEY"),
+		Durable:      true,
+		Exclusive:    false,
+	}
+
 	mysql, _ := database.NewMySQL(dbOpt)
-	gX := gx.NewGoXample(mysql)
+	rmq, _ := messenger.NewRabbitMQPublisher(rmqOpt)
+	gX := gx.NewGoXample(mysql, rmq)
 	gxHandler := handler.NewHandler(gX)
 
 	router := httprouter.New()

@@ -8,7 +8,8 @@ import (
 )
 
 type GoXample struct {
-	db DBInterface
+	db        DBInterface
+	messenger MessengerInterface
 }
 
 type DBInterface interface {
@@ -16,6 +17,10 @@ type DBInterface interface {
 	FindUserByID(context.Context, int) (User, error)
 	FindUserByCredential(context.Context, User) (User, error)
 	InsertLoginHistory(context.Context, User, time.Time) error
+}
+
+type MessengerInterface interface {
+	Publish(string, []byte) error
 }
 
 type User struct {
@@ -27,8 +32,11 @@ type User struct {
 	Active   bool   `json:"active"`
 }
 
-func NewGoXample(db DBInterface) GoXample {
-	return GoXample{db: db}
+func NewGoXample(db DBInterface, msgr MessengerInterface) GoXample {
+	return GoXample{
+		db:        db,
+		messenger: msgr,
+	}
 }
 
 func (g *GoXample) CreateUser(ctx context.Context, data string) (User, error) {
@@ -81,12 +89,12 @@ func (g *GoXample) GetUserByCredential(ctx context.Context, data string) (User, 
 		return User{}, err
 	}
 
-	go g.updateLoginHistory(ctx, user)
+	g.updateLoginHistory(ctx, user)
 
 	return user, nil
 }
 
 func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
-	loginAt := time.Now()
-	return g.db.InsertLoginHistory(ctx, user, loginAt)
+	// loginAt := time.Now()
+	return g.messenger.Publish("application/json", []byte("loginAt"))
 }
