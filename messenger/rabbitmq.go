@@ -6,7 +6,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type RabbitMQPublisher struct {
+type RabbitMQ struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
 	Queue      amqp.Queue
@@ -25,17 +25,17 @@ type RabbitMQOption struct {
 	Exclusive    bool
 }
 
-func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
+func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	// init connection
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/%s", opt.Username, opt.Password, opt.Host, opt.VHost))
 	if err != nil {
-		return &RabbitMQPublisher{}, err
+		return &RabbitMQ{}, err
 	}
 
 	// init channel
 	channel, err := conn.Channel()
 	if err != nil {
-		return &RabbitMQPublisher{}, err
+		return &RabbitMQ{}, err
 	}
 
 	// init exchange declaration
@@ -49,7 +49,7 @@ func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
 		nil,   // arguments
 	)
 	if err != nil {
-		return &RabbitMQPublisher{}, err
+		return &RabbitMQ{}, err
 	}
 
 	// init queue
@@ -62,7 +62,7 @@ func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
 		nil,           // arguments
 	)
 	if err != nil {
-		return &RabbitMQPublisher{}, err
+		return &RabbitMQ{}, err
 	}
 
 	// set QoS
@@ -72,7 +72,7 @@ func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
 		false, // global
 	)
 	if err != nil {
-		return &RabbitMQPublisher{}, err
+		return &RabbitMQ{}, err
 	}
 
 	// bind the queue
@@ -84,10 +84,10 @@ func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
 		nil,   // arguments
 	)
 	if err != nil {
-		return &RabbitMQPublisher{}, err
+		return &RabbitMQ{}, err
 	}
 
-	pub := &RabbitMQPublisher{
+	pub := &RabbitMQ{
 		Connection: conn,
 		Channel:    channel,
 		Queue:      queue,
@@ -96,7 +96,7 @@ func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
 	return pub, nil
 }
 
-func (r *RabbitMQPublisher) Publish(contentType string, data []byte) error {
+func (r *RabbitMQ) Publish(contentType string, data []byte) error {
 	err := r.Channel.Publish(
 		r.option.ExchangeName,
 		r.option.RoutingKey,

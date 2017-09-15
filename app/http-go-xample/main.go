@@ -39,7 +39,7 @@ func main() {
 	}
 
 	mysql, _ := database.NewMySQL(dbOpt)
-	rmq, _ := messenger.NewRabbitMQPublisher(rmqOpt)
+	rmq, _ := messenger.NewRabbitMQ(rmqOpt)
 	gX := gx.NewGoXample(mysql, rmq)
 	gxHandler := handler.NewHandler(gX)
 
