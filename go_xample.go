@@ -20,7 +20,7 @@ type DBInterface interface {
 }
 
 type MessengerInterface interface {
-	Publish(string, []byte) error
+	Publish(context.Context, string, []byte) error
 }
 
 type User struct {
@@ -110,5 +110,5 @@ func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
 		return err
 	}
 
-	return g.messenger.Publish("application/json", data)
+	return g.messenger.Publish(ctx, "application/json", data)
 }

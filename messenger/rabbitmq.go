@@ -1,6 +1,7 @@
 package messenger
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/streadway/amqp"
@@ -112,13 +113,14 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	return rmq, nil
 }
 
-func (r *RabbitMQ) Publish(contentType string, data []byte) error {
+func (r *RabbitMQ) Publish(ctx context.Context, contentType string, data []byte) error {
 	err := r.Channel.Publish(
 		r.option.ExchangeName,
 		r.option.RoutingKey,
 		false,
 		false,
 		amqp.Publishing{
+			Headers:     amqp.Table{"context": ctx},
 			ContentType: contentType,
 			Body:        data,
 		},
