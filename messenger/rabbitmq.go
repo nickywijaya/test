@@ -10,6 +10,7 @@ type RabbitMQPublisher struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
 	Queue      amqp.Queue
+	option     RabbitMQOption
 }
 
 type RabbitMQOption struct {
@@ -24,9 +25,9 @@ type RabbitMQOption struct {
 	Exclusive    bool
 }
 
-func NewRabbitMQPublisher(opt Option) (*RabbitMQPublisher, error) {
+func NewRabbitMQPublisher(opt RabbitMQOption) (*RabbitMQPublisher, error) {
 	// init connection
-	conn, err := amq.Dial(fmt.Sprintf("amqp://%s:%s@%s/%s", opt.Username, opt.Password, opt.Host, opt.VHost))
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/%s", opt.Username, opt.Password, opt.Host, opt.VHost))
 	if err != nil {
 		return &RabbitMQPublisher{}, err
 	}
@@ -90,6 +91,22 @@ func NewRabbitMQPublisher(opt Option) (*RabbitMQPublisher, error) {
 		Connection: conn,
 		Channel:    channel,
 		Queue:      queue,
+		option:     opt,
 	}
 	return pub, nil
+}
+
+func (r *RabbitMQPublisher) Publish(contentType string, data []byte) error {
+	err := r.Channel.Publish(
+		r.option.ExchangeName,
+		r.option.RoutingKey,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: contentType,
+			Body:        data,
+		},
+	)
+
+	return err
 }
