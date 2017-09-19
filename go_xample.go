@@ -16,11 +16,12 @@ type DBInterface interface {
 	InsertUser(context.Context, User) error
 	FindUserByID(context.Context, int) (User, error)
 	FindUserByCredential(context.Context, User) (User, error)
-	InsertLoginHistory(context.Context, User, time.Time) error
+	InsertLoginHistory(context.Context, LoginHistory) error
 }
 
 type MessengerInterface interface {
 	Publish(context.Context, string, []byte) error
+	Listen(GoXample)
 }
 
 type User struct {
@@ -111,4 +112,8 @@ func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
 	}
 
 	return g.messenger.Publish(ctx, "application/json", data)
+}
+
+func (g *GoXample) SaveLoginHistory(ctx context.Context, loginHistory LoginHistory) error {
+	return g.db.InsertLoginHistory(ctx, loginHistory)
 }
