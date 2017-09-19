@@ -2,17 +2,19 @@ package messenger
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
+	"github.com/bukalapak/packen/converter"
 	"github.com/streadway/amqp"
+
+	gx "github.com/bukalapak/go-xample"
 )
 
 type RabbitMQ struct {
-	Connection *amqp.Connection
-	Channel    *amqp.Channel
-	Queue      amqp.Queue
-	Inbox      <-chan amqp.Delivery
-	option     RabbitMQOption
+	channel  *amqp.Channel
+	messages <-chan amqp.Delivery
+	option   RabbitMQOption
 }
 
 type RabbitMQOption struct {
@@ -90,7 +92,7 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	}
 
 	// init consumer
-	inbox, err := channel.Consume(
+	messages, err := channel.Consume(
 		queue.Name,
 		"",            // consumer
 		false,         // auto-ack
@@ -104,23 +106,23 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	}
 
 	rmq := &RabbitMQ{
-		Connection: conn,
-		Channel:    channel,
-		Queue:      queue,
-		Inbox:      inbox,
-		option:     opt,
+		channel:  channel,
+		messages: messages,
+		option:   opt,
 	}
 	return rmq, nil
 }
 
 func (r *RabbitMQ) Publish(ctx context.Context, contentType string, data []byte) error {
-	err := r.Channel.Publish(
+	ctxMap := converter.ContextToMap(ctx)
+
+	err := r.channel.Publish(
 		r.option.ExchangeName,
 		r.option.RoutingKey,
 		false,
 		false,
 		amqp.Publishing{
-			Headers:     amqp.Table{"context": ctx},
+			Headers:     ctxMap,
 			ContentType: contentType,
 			Body:        data,
 		},
@@ -129,5 +131,21 @@ func (r *RabbitMQ) Publish(ctx context.Context, contentType string, data []byte)
 	return err
 }
 
-func (r *RabbitMQ) Receive() {
+func (r *RabbitMQ) Listen(goXample gx.GoXample) {
+	var loginHistory gx.LoginHistory
+
+	for message := range r.messages {
+		ctxMap := message.Headers
+		ctx, _ := converter.MapToContext(ctxMap)
+
+		err := json.Unmarshal(message.Body, &loginHistory)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		goXample.SaveLoginHistory(ctx, loginHistory)
+
+		message.Ack(false)
+	}
 }
