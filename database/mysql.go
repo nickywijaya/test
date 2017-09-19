@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -67,7 +66,7 @@ func (m *MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User
 	return user, nil
 }
 
-func (m *MySQL) InsertLoginHistory(ctx context.Context, user gx.User, loginAt time.Time) error {
-	_, err := m.db.Exec("INSERT INTO login_histories (username, login_at) VALUES(?, ?)", user.Username, loginAt)
+func (m *MySQL) InsertLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
+	_, err := m.db.Exec("INSERT INTO login_histories (username, login_at) VALUES(?, ?)", loginHistory.Username, loginHistory.LoginAt)
 	return err
 }
