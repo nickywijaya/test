@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bukalapak/packen/middleware"
 	"github.com/julienschmidt/httprouter"
 	"github.com/subosito/gotenv"
 
@@ -47,11 +46,7 @@ func main() {
 	router.GET("/healthz", gxHandler.Healthz)
 	router.GET("/metrics", gxHandler.Metric)
 
-	router.POST("/users", middleware.MonitorHTTP("create-user", gxHandler.CreateUser))
-	router.GET("/users/:id", middleware.MonitorHTTP("get-user", gxHandler.GetUser))
+	go rmq.Listen(goXample)
 
-	router.POST("/login", middleware.MonitorHTTP("login", gxHandler.Login))
-	router.GET("/logout", middleware.MonitorHTTP("logout", gxHandler.Logout))
-
-	http.ListenAndServe(":1234", router)
+	http.ListenAndServe(":1235", router)
 }

@@ -140,7 +140,6 @@ func (r *RabbitMQ) Listen(goXample gx.GoXample) {
 
 		err := json.Unmarshal(message.Body, &loginHistory)
 		if err != nil {
-			fmt.Println(err)
 			continue
 		}
 
