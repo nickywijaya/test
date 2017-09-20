@@ -3,11 +3,13 @@ package main
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/subosito/gotenv"
 
 	gx "github.com/bukalapak/go-xample"
+	"github.com/bukalapak/go-xample/connection"
 	"github.com/bukalapak/go-xample/database"
 	"github.com/bukalapak/go-xample/handler"
 	"github.com/bukalapak/go-xample/messenger"
@@ -37,9 +39,15 @@ func main() {
 		Exclusive:    false,
 	}
 
+	ecOpt := connection.Option{
+		Timeout: 3 * time.Second,
+	}
+
 	mysql, _ := database.NewMySQL(dbOpt)
 	rmq, _ := messenger.NewRabbitMQ(rmqOpt)
-	goXample := gx.NewGoXample(mysql, rmq)
+	emailChecker := connection.NewEmailChecker(ecOpt)
+
+	goXample := gx.NewGoXample(mysql, rmq, emailChecker)
 	gxHandler := handler.NewHandler(goXample)
 
 	router := httprouter.New()

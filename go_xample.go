@@ -8,8 +8,9 @@ import (
 )
 
 type GoXample struct {
-	db        DatabaseInterface
-	messenger MessengerInterface
+	database   DatabaseInterface
+	messenger  MessengerInterface
+	connection ConnectionInterface
 }
 
 type DatabaseInterface interface {
@@ -21,6 +22,10 @@ type DatabaseInterface interface {
 
 type MessengerInterface interface {
 	PublishLoginHistory(context.Context, LoginHistory) error
+}
+
+type ConnectionInterface interface {
+	IsEmailValid(context.Context, string) (bool, error)
 }
 
 type User struct {
@@ -37,10 +42,11 @@ type LoginHistory struct {
 	LoginAt  time.Time `json:"login_at"`
 }
 
-func NewGoXample(db DatabaseInterface, msgr MessengerInterface) GoXample {
+func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionInterface) GoXample {
 	return GoXample{
-		db:        db,
-		messenger: msgr,
+		database:   db,
+		messenger:  msgr,
+		connection: conn,
 	}
 }
 
@@ -58,7 +64,7 @@ func (g *GoXample) CreateUser(ctx context.Context, data string) (User, error) {
 		return User{}, err
 	}
 
-	err = g.db.InsertUser(ctx, user)
+	err = g.database.InsertUser(ctx, user)
 	if err != nil {
 		return User{}, err
 	}
@@ -73,7 +79,7 @@ func (g *GoXample) GetUserByID(ctx context.Context, id int) (User, error) {
 	default:
 	}
 
-	user, err := g.db.FindUserByID(ctx, id)
+	user, err := g.database.FindUserByID(ctx, id)
 	if err != nil {
 		return User{}, err
 	}
@@ -89,7 +95,7 @@ func (g *GoXample) GetUserByCredential(ctx context.Context, data string) (User, 
 		return User{}, err
 	}
 
-	user, err = g.db.FindUserByCredential(ctx, user)
+	user, err = g.database.FindUserByCredential(ctx, user)
 	if err != nil {
 		return User{}, err
 	}
@@ -109,5 +115,5 @@ func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
 }
 
 func (g *GoXample) SaveLoginHistory(ctx context.Context, loginHistory LoginHistory) error {
-	return g.db.InsertLoginHistory(ctx, loginHistory)
+	return g.database.InsertLoginHistory(ctx, loginHistory)
 }
