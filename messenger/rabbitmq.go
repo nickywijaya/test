@@ -113,17 +113,22 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	return rmq, nil
 }
 
-func (r *RabbitMQ) Publish(ctx context.Context, contentType string, data []byte) error {
+func (r *RabbitMQ) PublishLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
 	ctxMap := converter.ContextToMap(ctx)
 
-	err := r.channel.Publish(
+	data, err := json.Marshal(loginHistory)
+	if err != nil {
+		return err
+	}
+
+	err = r.channel.Publish(
 		r.option.ExchangeName,
 		r.option.RoutingKey,
 		false,
 		false,
 		amqp.Publishing{
 			Headers:     ctxMap,
-			ContentType: contentType,
+			ContentType: "application/json",
 			Body:        data,
 		},
 	)
