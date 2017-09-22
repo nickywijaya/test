@@ -17,7 +17,9 @@ type DatabaseInterface interface {
 	InsertUser(context.Context, User) error
 	FindUserByID(context.Context, int) (User, error)
 	FindUserByCredential(context.Context, User) (User, error)
+	FindInactiveUsers(context.Context) ([]User, error)
 	InsertLoginHistory(context.Context, LoginHistory) error
+	DeactivateUsers(context.Context, []User) error
 }
 
 type MessengerInterface interface {
@@ -116,4 +118,18 @@ func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
 
 func (g *GoXample) SaveLoginHistory(ctx context.Context, loginHistory LoginHistory) error {
 	return g.database.InsertLoginHistory(ctx, loginHistory)
+}
+
+func (g *GoXample) DeactivateInactiveUsers(ctx context.Context) error {
+	users, err := g.database.FindInactiveUsers(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = g.database.DeactivateUsers(ctx, users)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

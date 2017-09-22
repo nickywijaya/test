@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -45,9 +47,15 @@ func (m *MySQL) InsertUser(ctx context.Context, user gx.User) error {
 }
 
 func (m *MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
+	select {
+	case <-ctx.Done():
+		return gx.User{}, errors.New("Timeout")
+	default:
+	}
+
 	var user gx.User
 
-	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active=true AND id=?", id).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
+	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active = true AND id = ?", id).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
 	if err != nil {
 		return gx.User{}, err
 	}
@@ -56,9 +64,15 @@ func (m *MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 }
 
 func (m *MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User, error) {
+	select {
+	case <-ctx.Done():
+		return gx.User{}, errors.New("Timeout")
+	default:
+	}
+
 	var user gx.User
 
-	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active=true AND username=? AND password=?", cred.Username, cred.Password).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
+	err := m.db.QueryRow("SELECT id, name, username, password, email, active FROM users WHERE active = true AND username = ? AND password = ?", cred.Username, cred.Password).Scan(&user.ID, &user.Name, &user.Username, &user.Password, &user.Email, &user.Active)
 	if err != nil {
 		return gx.User{}, err
 	}
@@ -67,6 +81,73 @@ func (m *MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User
 }
 
 func (m *MySQL) InsertLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
+	select {
+	case <-ctx.Done():
+		return errors.New("Timeout")
+	default:
+	}
+
 	_, err := m.db.Exec("INSERT INTO login_histories (username, login_at) VALUES(?, ?)", loginHistory.Username, loginHistory.LoginAt)
 	return err
+}
+
+func (m *MySQL) FindInactiveUsers(ctx context.Context) ([]gx.User, error) {
+	select {
+	case <-ctx.Done():
+		return []gx.User{}, errors.New("Timeout")
+	default:
+	}
+
+	var users []gx.User
+
+	rows, err := m.db.Query(`
+			SELECT users.username
+			FROM users
+			INNER JOIN login_histories
+				ON users.username = login_histories.username
+			WHERE users.active = true
+			GROUP BY users.username
+			HAVING DATEDIFF(?, MAX(login_histories.login_at)) >= 30
+	`, time.Now())
+	if err != nil {
+		return users, err
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var user gx.User
+
+		if err = rows.Scan(&user.Username); err != nil {
+			return users, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+func (m *MySQL) DeactivateUsers(ctx context.Context, users []gx.User) error {
+	select {
+	case <-ctx.Done():
+		return errors.New("Timeout")
+	default:
+	}
+
+	var usernames []interface{}
+
+	for _, user := range users {
+		usernames = append(usernames, user.Username)
+	}
+
+	_, err := m.db.Exec(`
+		UPDATE users
+		SET active = false
+		WHERE username IN (? `+strings.Repeat(",?", len(usernames)-1)+`)
+	`, usernames...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
