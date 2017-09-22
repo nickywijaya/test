@@ -9,28 +9,52 @@
 			"revisionTime": "2016-08-04T10:47:26Z"
 		},
 		{
-			"checksumSHA1": "HQZg1o9lb8vTEelQJb5tY13kxt0=",
-			"path": "github.com/bukalapak/packen/metric",
-			"revision": "dc7e76d834bd216d9b0abdeaced48cc42befcf17",
-			"revisionTime": "2017-09-13T06:04:49Z"
+			"checksumSHA1": "EGPkHVqbnNs0mO73kO91K3XmGGY=",
+			"path": "github.com/bukalapak/packen/converter",
+			"revision": "0176242413d19a29365b98df50bc6e4e7f2d935d",
+			"revisionTime": "2017-09-22T10:09:33Z"
 		},
 		{
-			"checksumSHA1": "FMjzEYyTAq53cbYOsHGrbjG1SI4=",
+			"checksumSHA1": "HQZg1o9lb8vTEelQJb5tY13kxt0=",
+			"path": "github.com/bukalapak/packen/metric",
+			"revision": "0176242413d19a29365b98df50bc6e4e7f2d935d",
+			"revisionTime": "2017-09-22T10:09:33Z"
+		},
+		{
+			"checksumSHA1": "nA51Ep53i3h6tZ1qyV9KoupFxek=",
 			"path": "github.com/bukalapak/packen/middleware",
-			"revision": "dc7e76d834bd216d9b0abdeaced48cc42befcf17",
-			"revisionTime": "2017-09-13T06:04:49Z"
+			"revision": "0176242413d19a29365b98df50bc6e4e7f2d935d",
+			"revisionTime": "2017-09-22T10:09:33Z"
 		},
 		{
 			"checksumSHA1": "zBuE9a5Pbxz2gI+WQNwMIm4rmhE=",
 			"path": "github.com/bukalapak/packen/response",
-			"revision": "dc7e76d834bd216d9b0abdeaced48cc42befcf17",
-			"revisionTime": "2017-09-13T06:04:49Z"
+			"revision": "0176242413d19a29365b98df50bc6e4e7f2d935d",
+			"revisionTime": "2017-09-22T10:09:33Z"
 		},
 		{
-			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
+			"checksumSHA1": "ifqW/LRKbFkyN+VryAzXUHlny40=",
+			"path": "github.com/cenk/backoff",
+			"revision": "61ba96c4d1002f22e06acb8e34a7650611125a63",
+			"revisionTime": "2017-09-19T12:10:20Z"
+		},
+		{
+			"checksumSHA1": "imR2wF388/0fBU6RRWx8RvTi8Q8=",
+			"path": "github.com/facebookgo/clock",
+			"revision": "600d898af40aa09a7a93ecb9265d87b0504b6f03",
+			"revisionTime": "2015-04-10T01:09:13Z"
+		},
+		{
+			"checksumSHA1": "Ube1AAmhqrtUybqayzBTI7qWo/4=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "e3f0fdcf52770a162d5a4540ddb8d9957ff456d1",
+			"revisionTime": "2017-06-01T06:26:16Z"
+		},
+		{
+			"checksumSHA1": "yqF125xVSkmfLpIVGrLlfE05IUk=",
 			"path": "github.com/golang/protobuf/proto",
-			"revision": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef",
-			"revisionTime": "2017-03-31T03:19:02Z"
+			"revision": "ae59567b9aab61b50b2590679a62c3c044030b61",
+			"revisionTime": "2017-09-19T00:21:09Z"
 		},
 		{
 			"checksumSHA1": "gKyBj05YkfuLFruAyPZ4KV9nFp8=",
@@ -93,10 +117,34 @@
 			"revisionTime": "2017-02-16T22:32:56Z"
 		},
 		{
+			"checksumSHA1": "q6JII/ziSLMqwajFGHj6w8V+RbA=",
+			"path": "github.com/rubyist/circuitbreaker",
+			"revision": "2074adba5ddc7d5f7559448a9c3066573521c5bf",
+			"revisionTime": "2017-03-30T19:36:47Z"
+		},
+		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "5bf94b69c6b68ee1b541973bb8e1144db23a194b",
 			"revisionTime": "2017-03-21T23:07:31Z"
+		},
+		{
+			"checksumSHA1": "LABAG6dyYKeWXmRCXwU6Vic2WwU=",
+			"path": "github.com/streadway/amqp",
+			"revision": "dfe15e36048539f4cda41f240b27a5ca25b9cd46",
+			"revisionTime": "2017-05-21T21:24:53Z"
+		},
+		{
+			"checksumSHA1": "TroUrCnO7mVi4ZB+I5t4gXJZdE0=",
+			"path": "github.com/subosito/gotenv",
+			"revision": "009e1f9581dc712aba5682a279dee155ca3eeded",
+			"revisionTime": "2017-01-20T14:09:13Z"
+		},
+		{
+			"checksumSHA1": "Y+HGqEkYM15ir+J93MEaHdyFy0c=",
+			"path": "golang.org/x/net/context",
+			"revision": "d1e1b351919c6738fdeb9893d5c998b161464f0c",
+			"revisionTime": "2016-12-29T22:47:41Z"
 		}
 	],
 	"rootPath": "github.com/bukalapak/go-xample"
