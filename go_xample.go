@@ -71,6 +71,14 @@ func (g *GoXample) CreateUser(ctx context.Context, data string) (User, error) {
 		return User{}, err
 	}
 
+	valid, err := g.connection.IsEmailValid(ctx, user.Email)
+	if err != nil {
+		return User{}, err
+	}
+	if !valid {
+		return User{}, errors.New("Email Invalid")
+	}
+
 	return user, nil
 }
 
