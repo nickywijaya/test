@@ -17,6 +17,8 @@ http-go-xample
 !http-go-xample/
 background-go-xample
 !background-go-xample/
+cron-go-xample
+!cron-go-xample/
 
 go-xample
 !go-xample/
