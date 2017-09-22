@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/rubyist/circuitbreaker"
@@ -51,9 +52,11 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 		request, _ := http.NewRequest("GET", fmt.Sprintf("%s?email=%s", os.Getenv("EMAIL_CHECKER_URL"), email), nil)
 
 		reqID, _ := ctx.Value("Request-ID").(string)
+		actor, _ := ctx.Value("Authorization").(string)
 
 		request.Header.Set("Accept", "application/json")
 		request.Header.Set("Request-ID", reqID)
+		request.Header.Set("Authorization", actor)
 
 		var (
 			err      error
@@ -62,6 +65,8 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 
 		retry := 0
 		for retry < 3 {
+			request.Header.Set("Retry", strconv.Itoa(retry))
+
 			response, err = a.client.Do(request)
 			if (err != nil || response.StatusCode != 200) && retry < 3 {
 				retry++
