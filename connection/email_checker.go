@@ -55,15 +55,28 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 		request.Header.Set("Accept", "application/json")
 		request.Header.Set("Request-ID", reqID)
 
-		response, err := a.client.Do(request)
-		if err != nil {
-			a.cb.Fail()
-			return false, err
-		}
+		var (
+			err      error
+			response *http.Response
+		)
 
-		if response.StatusCode != 200 {
-			a.cb.Fail()
-			return false, errors.New(fmt.Sprintf("HTTP Response Code: %d", response.StatusCode))
+		retry := 0
+		for retry < 3 {
+			response, err = a.client.Do(request)
+			if (err != nil || response.StatusCode != 200) && retry < 3 {
+				retry++
+				continue
+			}
+
+			if err != nil {
+				a.cb.Fail()
+				return false, err
+			}
+
+			if response.StatusCode != 200 {
+				a.cb.Fail()
+				return false, errors.New(fmt.Sprintf("HTTP Response Code: %d", response.StatusCode))
+			}
 		}
 
 		defer response.Body.Close()
