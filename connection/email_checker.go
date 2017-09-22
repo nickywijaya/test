@@ -9,9 +9,12 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/rubyist/circuitbreaker"
 )
 
 type EmailChecker struct {
+	cb     *circuit.Breaker
 	client *http.Client
 	option Option
 }
@@ -33,42 +36,55 @@ func NewEmailChecker(opt Option) *EmailChecker {
 		Timeout: opt.Timeout,
 	}
 
+	// create a circuit breaker that will trip if there are at least 10 errors out of 100 requests (10%)
+	cb := circuit.NewRateBreaker(0.1, 100)
+
 	return &EmailChecker{
+		cb:     cb,
 		client: client,
 		option: opt,
 	}
 }
 
 func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, error) {
-	request, _ := http.NewRequest("GET", fmt.Sprintf("%s?email=%s", os.Getenv("EMAIL_CHECKER_URL"), email), nil)
+	if a.cb.Ready() {
+		request, _ := http.NewRequest("GET", fmt.Sprintf("%s?email=%s", os.Getenv("EMAIL_CHECKER_URL"), email), nil)
 
-	reqID, _ := ctx.Value("Request-ID").(string)
+		reqID, _ := ctx.Value("Request-ID").(string)
 
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Request-ID", reqID)
+		request.Header.Set("Accept", "application/json")
+		request.Header.Set("Request-ID", reqID)
 
-	response, err := a.client.Do(request)
-	if err != nil {
-		return false, err
+		response, err := a.client.Do(request)
+		if err != nil {
+			a.cb.Fail()
+			return false, err
+		}
+
+		if response.StatusCode != 200 {
+			a.cb.Fail()
+			return false, errors.New(fmt.Sprintf("HTTP Response Code: %d", response.StatusCode))
+		}
+
+		defer response.Body.Close()
+
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			a.cb.Success()
+			return false, err
+		}
+
+		var mail Email
+
+		err = json.Unmarshal(body, &mail)
+		if err != nil {
+			a.cb.Success()
+			return false, err
+		}
+
+		a.cb.Success()
+		return mail.Valid, nil
+	} else {
+		return false, errors.New("Circuit Breaker is in Trip State")
 	}
-
-	if response.StatusCode != 200 {
-		return false, errors.New(fmt.Sprintf("HTTP Response Code: %d", response.StatusCode))
-	}
-
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return false, err
-	}
-
-	var mail Email
-
-	err = json.Unmarshal(body, &mail)
-	if err != nil {
-		return false, err
-	}
-
-	return mail.Valid, nil
 }
