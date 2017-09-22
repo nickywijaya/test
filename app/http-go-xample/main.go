@@ -46,9 +46,9 @@ func main() {
 
 	mysql, _ := database.NewMySQL(dbOpt)
 	rmq, _ := messenger.NewRabbitMQ(rmqOpt)
-	emailChecker := connection.NewEmailChecker(ecOpt)
+	ec := connection.NewEmailChecker(ecOpt)
 
-	goXample := gx.NewGoXample(mysql, rmq, emailChecker)
+	goXample := gx.NewGoXample(mysql, rmq, ec)
 	gxHandler := handler.NewHandler(goXample)
 
 	router := httprouter.New()
