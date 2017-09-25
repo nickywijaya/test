@@ -82,6 +82,8 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 				a.cb.Fail()
 				return false, errors.New(fmt.Sprintf("HTTP Response Code: %d", response.StatusCode))
 			}
+
+			break
 		}
 
 		defer response.Body.Close()
