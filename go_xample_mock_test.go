@@ -1,4 +1,4 @@
-package database
+package go_xample_test
 
 import (
 	"context"
@@ -121,4 +121,26 @@ func unmarshalUser(key string) gx.User {
 	json.Unmarshal(b, &user)
 
 	return user
+}
+
+type RabbitMQMock struct{}
+
+func (r *RabbitMQMock) PublishLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
+	if loginHistory.Username == "bad-user" {
+		return errors.New("Error! Bad user!")
+	}
+
+	return nil
+}
+
+type EmailCheckerMock struct{}
+
+func (e *EmailCheckerMock) IsEmailValid(ctx context.Context, email string) (bool, error) {
+	if email == "bad@email.com" {
+		return false, errors.New("Error! Bad email!")
+	} else if email == "invalid@email.com" {
+		return false, nil
+	}
+
+	return true, nil
 }

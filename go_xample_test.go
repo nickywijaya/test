@@ -9,14 +9,11 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	gx "github.com/bukalapak/go-xample"
-	"github.com/bukalapak/go-xample/connection"
-	"github.com/bukalapak/go-xample/database"
-	"github.com/bukalapak/go-xample/messenger"
 )
 
 type GoXampleSuite struct {
 	suite.Suite
-	goXample gx.GoXample
+	goXample *gx.GoXample
 }
 
 func TestGoXampleSuite(t *testing.T) {
@@ -24,17 +21,17 @@ func TestGoXampleSuite(t *testing.T) {
 }
 
 func (g *GoXampleSuite) SetupSuite() {
-	db := &database.MySQLMock{}
-	msgr := &messenger.RabbitMQMock{}
-	conn := &connection.EmailCheckerMock{}
+	db := &MySQLMock{}
+	msgr := &RabbitMQMock{}
+	conn := &EmailCheckerMock{}
 
 	g.goXample = gx.NewGoXample(db, msgr, conn)
 }
 
 func (g *GoXampleSuite) TestNewGoXample() {
-	db := &database.MySQLMock{}
-	msgr := &messenger.RabbitMQMock{}
-	conn := &connection.EmailCheckerMock{}
+	db := &MySQLMock{}
+	msgr := &RabbitMQMock{}
+	conn := &EmailCheckerMock{}
 
 	goXample := gx.NewGoXample(db, msgr, conn)
 
