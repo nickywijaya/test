@@ -9,7 +9,6 @@ NOCACHE     = --no-cache
 VERSION     = $(shell git show -q --format=%h)
 SERVICES   ?= http-go-xample background-go-xample cron-go-xample
 
-# development
 dep:
 	go get -u github.com/kardianos/govendor
 	govendor sync
@@ -18,6 +17,10 @@ pretty:
 	# gofmt -d -w $$(find . -type f -name '*.go' -not -path "./vendor/*")
 	goimports -d -w $$(find . -type f -name '*.go' -not -path "./vendor/*")
 	go tool vet .
+
+coverage:
+	@./coverage.sh
+	go tool cover -html=coverage.out -o coverage.html
 
 all:
 	consul compile build push deployment
