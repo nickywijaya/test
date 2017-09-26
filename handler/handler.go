@@ -1,3 +1,4 @@
+// Package handler manages the data flow from client to appropriate service.
 package handler
 
 import (
@@ -15,29 +16,35 @@ import (
 	gx "github.com/bukalapak/go-xample"
 )
 
+// Handler controls request flow from client to service
 type Handler struct {
 	goXample *gx.GoXample
 }
 
+// Meta is used to consolidate all meta statuses
 type Meta struct {
 	HTTPStatus int `json:"http_status"`
 }
 
-func NewHandler(goXample *gx.GoXample) Handler {
-	return Handler{
+// NewHandler returns a pointer of Handler instance
+func NewHandler(goXample *gx.GoXample) *Handler {
+	return &Handler{
 		goXample: goXample,
 	}
 }
 
+// Healthz is used to control the flow of GET /healthz endpoint
 func (h *Handler) Healthz(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, "ok")
 }
 
+// Metric is used to control the flow of GET /metrics endpoint
 func (h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	metric.Handler(w, r)
 }
 
+// CreateUser is used to control the flow of POST /users endpoint
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
 	ctx := r.Context()
 	select {
@@ -69,6 +76,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params http
 	return nil
 }
 
+// GetUser is used to control the flow of GET /users endpoint
 func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
 	ctx := r.Context()
 	select {
@@ -93,6 +101,7 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request, params httprou
 	return nil
 }
 
+// Login is used to control the flow of POST /login endpoint
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
 	ctx := r.Context()
 	select {
@@ -124,6 +133,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 	return nil
 }
 
+// Logout is used to control the flow of GET /logout endpoint
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request, params httprouter.Params) error {
 	ctx := r.Context()
 	select {

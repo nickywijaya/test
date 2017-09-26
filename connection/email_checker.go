@@ -1,3 +1,5 @@
+// Package connection contains implementation of connection service.
+// Any connection to third party service should be implemented here.
 package connection
 
 import (
@@ -14,20 +16,24 @@ import (
 	"github.com/rubyist/circuitbreaker"
 )
 
+// EmailChecker holds the functionality to call Email Checker service.
 type EmailChecker struct {
 	cb     *circuit.Breaker
 	client *http.Client
 	option Option
 }
 
+// Option holds all necessary options to make connection.
 type Option struct {
 	Timeout time.Duration
 }
 
+// Email holds the response from Email Checker service.
 type Email struct {
 	Valid bool `json:"valid"`
 }
 
+// NewEmailChecker returns a pointer of EmailChecker instance
 func NewEmailChecker(opt Option) *EmailChecker {
 	if opt.Timeout == 0 {
 		opt.Timeout = 3 * time.Second
@@ -47,6 +53,7 @@ func NewEmailChecker(opt Option) *EmailChecker {
 	}
 }
 
+// IsEmailValid checks whether an email is valid.
 func (e *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, error) {
 	if e.cb.Ready() {
 		request, _ := http.NewRequest("GET", fmt.Sprintf("%s?email=%s", os.Getenv("EMAIL_CHECKER_URL"), email), nil)

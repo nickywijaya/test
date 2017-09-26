@@ -1,3 +1,5 @@
+// Package messenger contains implementation of messenger service.
+// Any messaging service should be implemented here.
 package messenger
 
 import (
@@ -11,12 +13,15 @@ import (
 	gx "github.com/bukalapak/go-xample"
 )
 
+// RabbitMQ is a client for rabbitmq service.
+// It publishes and receives message via AMQP.
 type RabbitMQ struct {
 	channel  *amqp.Channel
 	messages <-chan amqp.Delivery
 	option   RabbitMQOption
 }
 
+// RabbitMQOption holds all necessary options for RabbitMQ.
 type RabbitMQOption struct {
 	Username     string
 	Password     string
@@ -29,6 +34,8 @@ type RabbitMQOption struct {
 	Exclusive    bool
 }
 
+// NewRabbitMQ returns a pointer of RabbitMQ instance and an error.
+// It takes an instance of RabbitMQOption
 func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	// init connection
 	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/%s", opt.Username, opt.Password, opt.Host, opt.VHost))
@@ -113,6 +120,7 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 	return rmq, nil
 }
 
+// PublishLoginHistory sends LoginHistory to queue
 func (r *RabbitMQ) PublishLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
 	ctxMap := converter.ContextToMap(ctx)
 
@@ -136,6 +144,9 @@ func (r *RabbitMQ) PublishLoginHistory(ctx context.Context, loginHistory gx.Logi
 	return err
 }
 
+// Listen receives message from queue.
+// It takes an pointer of GoXample as its parameter.
+// The received message the will be forwarded to GoXample to be saved in database.
 func (r *RabbitMQ) Listen(goXample *gx.GoXample) {
 	var loginHistory gx.LoginHistory
 

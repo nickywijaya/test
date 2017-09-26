@@ -1,3 +1,6 @@
+// Package go_xample is the main package for GoXample project.
+// It contains all definitions and implementation of the project.
+// It also specifies its dependencies.
 package go_xample
 
 import (
@@ -8,13 +11,15 @@ import (
 
 // GoXample is the main struct that holds all business logic.
 // Its functions explain its service and purpose.
-// It should be called in command (main.go).
 type GoXample struct {
 	database   DatabaseInterface
 	messenger  MessengerInterface
 	connection ConnectionInterface
 }
 
+// DatabaseInterface is a contract for database client.
+// The functions are specific.
+// They depends on GoXample's needs.
 type DatabaseInterface interface {
 	InsertUser(context.Context, User) error
 	FindUserByID(context.Context, int) (User, error)
@@ -24,14 +29,22 @@ type DatabaseInterface interface {
 	DeactivateUsers(context.Context, []User) error
 }
 
+// MessengerInterface is a contract for messenger client.
+// The functions are specific.
+// They depends on GoXample's needs.
 type MessengerInterface interface {
 	PublishLoginHistory(context.Context, LoginHistory) error
 }
 
+// ConnectionInterface is a contract for third party service.
+// The functions are specific.
+// They depends on GoXample's needs.
 type ConnectionInterface interface {
 	IsEmailValid(context.Context, string) (bool, error)
 }
 
+// User holds data for user.
+// It has six fields.
 type User struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name, omitempty"`
@@ -41,11 +54,15 @@ type User struct {
 	Active   bool   `json:"active"`
 }
 
+// LoginHistory holds data for user's login history.
+// It only has two fields: Username and LoginAt.
 type LoginHistory struct {
 	Username string    `json:"username"`
 	LoginAt  time.Time `json:"login_at"`
 }
 
+// NewGoXample returns a pointer of GoXample instance.
+// It takes three parameters.
 func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionInterface) *GoXample {
 	return &GoXample{
 		database:   db,
@@ -54,6 +71,7 @@ func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionI
 	}
 }
 
+// CreateUser is a function to create user and write it to database
 func (g *GoXample) CreateUser(ctx context.Context, user User) (User, error) {
 	select {
 	case <-ctx.Done():
@@ -77,6 +95,7 @@ func (g *GoXample) CreateUser(ctx context.Context, user User) (User, error) {
 	return user, nil
 }
 
+// GetUserByID is a function to retrieve user data by their id.
 func (g *GoXample) GetUserByID(ctx context.Context, id int) (User, error) {
 	select {
 	case <-ctx.Done():
@@ -92,6 +111,7 @@ func (g *GoXample) GetUserByID(ctx context.Context, id int) (User, error) {
 	return user, nil
 }
 
+// GetUserByCredential is a function to retrieve user data by their username and password.
 func (g *GoXample) GetUserByCredential(ctx context.Context, user User) (User, error) {
 	select {
 	case <-ctx.Done():
@@ -118,10 +138,13 @@ func (g *GoXample) updateLoginHistory(ctx context.Context, user User) error {
 	return g.messenger.PublishLoginHistory(ctx, loginHistory)
 }
 
+// SaveLoginHistory is a function to save LoginHistory to database.
 func (g *GoXample) SaveLoginHistory(ctx context.Context, loginHistory LoginHistory) error {
 	return g.database.InsertLoginHistory(ctx, loginHistory)
 }
 
+// DeactivateInactiveUsers is a function to turn the value of field `active` from true to false.
+// The affected users are users who haven't done any login activity in the last 30 days.
 func (g *GoXample) DeactivateInactiveUsers(ctx context.Context) error {
 	users, err := g.database.FindInactiveUsers(ctx)
 	if err != nil {

@@ -1,3 +1,5 @@
+// Package database contains implementation of database service.
+// Any database service should be implemented here.
 package database
 
 import (
@@ -13,10 +15,12 @@ import (
 	gx "github.com/bukalapak/go-xample"
 )
 
+// MySQL holds the functionality to do database-related works in MySQL.
 type MySQL struct {
 	db *sql.DB
 }
 
+// Option holds all necessary options for database.
 type Option struct {
 	User     string
 	Password string
@@ -26,6 +30,7 @@ type Option struct {
 	Charset  string
 }
 
+// NewMySQL returns a pointer of MySQL instance and error.
 func NewMySQL(opt Option) (*MySQL, error) {
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s", opt.User, opt.Password, opt.Host, opt.Port, opt.Database, opt.Charset))
 	if err != nil {
@@ -35,6 +40,7 @@ func NewMySQL(opt Option) (*MySQL, error) {
 	return &MySQL{db: db}, nil
 }
 
+// InsertUser is used to write User data to MySQL.
 func (m *MySQL) InsertUser(ctx context.Context, user gx.User) error {
 	select {
 	case <-ctx.Done():
@@ -46,6 +52,7 @@ func (m *MySQL) InsertUser(ctx context.Context, user gx.User) error {
 	return err
 }
 
+// FindUserByID is used to retrieve User data from MySQL by their ID.
 func (m *MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 	select {
 	case <-ctx.Done():
@@ -63,6 +70,7 @@ func (m *MySQL) FindUserByID(ctx context.Context, id int) (gx.User, error) {
 	return user, nil
 }
 
+// FindUserByCredential is used to retrieve User data from MySQL by their username and password.
 func (m *MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User, error) {
 	select {
 	case <-ctx.Done():
@@ -80,6 +88,7 @@ func (m *MySQL) FindUserByCredential(ctx context.Context, cred gx.User) (gx.User
 	return user, nil
 }
 
+// InsertLoginHistory is used to write LoginHistory data to MySQL.
 func (m *MySQL) InsertLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
 	select {
 	case <-ctx.Done():
@@ -91,6 +100,7 @@ func (m *MySQL) InsertLoginHistory(ctx context.Context, loginHistory gx.LoginHis
 	return err
 }
 
+// FindInactiveUsers is used to retrieve User data from MySQL whose last login was 30 days ago.
 func (m *MySQL) FindInactiveUsers(ctx context.Context) ([]gx.User, error) {
 	select {
 	case <-ctx.Done():
@@ -127,6 +137,7 @@ func (m *MySQL) FindInactiveUsers(ctx context.Context) ([]gx.User, error) {
 	return users, nil
 }
 
+// DeactivateUsers is used to set User's active field from true to false
 func (m *MySQL) DeactivateUsers(ctx context.Context, users []gx.User) error {
 	select {
 	case <-ctx.Done():
