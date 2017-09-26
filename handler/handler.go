@@ -16,16 +16,16 @@ import (
 )
 
 type Handler struct {
-	Gx gx.GoXample
+	goXample *gx.GoXample
 }
 
 type Meta struct {
 	HTTPStatus int `json:"http_status"`
 }
 
-func NewHandler(goXample gx.GoXample) Handler {
+func NewHandler(goXample *gx.GoXample) Handler {
 	return Handler{
-		Gx: goXample,
+		goXample: goXample,
 	}
 }
 
@@ -59,7 +59,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params http
 		return err
 	}
 
-	user, err = h.Gx.CreateUser(ctx, user)
+	user, err = h.goXample.CreateUser(ctx, user)
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -83,7 +83,7 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request, params httprou
 		return err
 	}
 
-	user, err := h.Gx.GetUserByID(ctx, userID)
+	user, err := h.goXample.GetUserByID(ctx, userID)
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -114,7 +114,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 		return err
 	}
 
-	user, err = h.Gx.GetUserByCredential(ctx, user)
+	user, err = h.goXample.GetUserByCredential(ctx, user)
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -137,8 +137,8 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request, params httprout
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	// res := response.BuildError([]error{err})
-	response.Write(w, err)
+	res := response.BuildError([]error{err})
+	response.Write(w, res)
 }
 
 func writeSuccess(w http.ResponseWriter, data interface{}) {

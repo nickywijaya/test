@@ -136,7 +136,7 @@ func (r *RabbitMQ) PublishLoginHistory(ctx context.Context, loginHistory gx.Logi
 	return err
 }
 
-func (r *RabbitMQ) Listen(goXample gx.GoXample) {
+func (r *RabbitMQ) Listen(goXample *gx.GoXample) {
 	var loginHistory gx.LoginHistory
 
 	for message := range r.messages {

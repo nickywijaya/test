@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// GoXample is the main struct that holds all business logic.
+// Its functions explain its service and purpose.
+// It should be called in command (main.go).
 type GoXample struct {
 	database   DatabaseInterface
 	messenger  MessengerInterface
@@ -43,8 +46,8 @@ type LoginHistory struct {
 	LoginAt  time.Time `json:"login_at"`
 }
 
-func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionInterface) GoXample {
-	return GoXample{
+func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionInterface) *GoXample {
+	return &GoXample{
 		database:   db,
 		messenger:  msgr,
 		connection: conn,
