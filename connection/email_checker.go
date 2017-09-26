@@ -47,8 +47,8 @@ func NewEmailChecker(opt Option) *EmailChecker {
 	}
 }
 
-func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, error) {
-	if a.cb.Ready() {
+func (e *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, error) {
+	if e.cb.Ready() {
 		request, _ := http.NewRequest("GET", fmt.Sprintf("%s?email=%s", os.Getenv("EMAIL_CHECKER_URL"), email), nil)
 
 		reqID, _ := ctx.Value("Request-ID").(string)
@@ -67,19 +67,19 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 		for retry < 3 {
 			request.Header.Set("Retry", strconv.Itoa(retry))
 
-			response, err = a.client.Do(request)
+			response, err = e.client.Do(request)
 			if (err != nil || response.StatusCode != 200) && retry < 3 {
 				retry++
 				continue
 			}
 
 			if err != nil {
-				a.cb.Fail()
+				e.cb.Fail()
 				return false, err
 			}
 
 			if response.StatusCode != 200 {
-				a.cb.Fail()
+				e.cb.Fail()
 				return false, errors.New(fmt.Sprintf("HTTP Response Code: %d", response.StatusCode))
 			}
 
@@ -90,7 +90,7 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 
 		body, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			a.cb.Success()
+			e.cb.Success()
 			return false, err
 		}
 
@@ -98,11 +98,11 @@ func (a *EmailChecker) IsEmailValid(ctx context.Context, email string) (bool, er
 
 		err = json.Unmarshal(body, &mail)
 		if err != nil {
-			a.cb.Success()
+			e.cb.Success()
 			return false, err
 		}
 
-		a.cb.Success()
+		e.cb.Success()
 		return mail.Valid, nil
 	} else {
 		return false, errors.New("Circuit Breaker is in Trip State")
