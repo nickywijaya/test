@@ -90,6 +90,12 @@ func (g *GoXample) GetUserByID(ctx context.Context, id int) (User, error) {
 }
 
 func (g *GoXample) GetUserByCredential(ctx context.Context, user User) (User, error) {
+	select {
+	case <-ctx.Done():
+		return User{}, errors.New("Timeout")
+	default:
+	}
+
 	user, err := g.database.FindUserByCredential(ctx, user)
 	if err != nil {
 		return User{}, err
