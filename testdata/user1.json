@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "name": "User1",
+  "username": "user1",
+  "password": "passworduser1",
+  "email": "user1@email.com",
+  "active": true
+}
