@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -51,7 +52,14 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request, params http
 		return err
 	}
 
-	user, err := h.Gx.CreateUser(ctx, string(body))
+	var user gx.User
+
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		return err
+	}
+
+	user, err = h.Gx.CreateUser(ctx, user)
 	if err != nil {
 		writeError(w, err)
 		return err
@@ -99,7 +107,14 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 		return err
 	}
 
-	user, err := h.Gx.GetUserByCredential(ctx, string(body))
+	var user gx.User
+
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		return err
+	}
+
+	user, err = h.Gx.GetUserByCredential(ctx, user)
 	if err != nil {
 		writeError(w, err)
 		return err

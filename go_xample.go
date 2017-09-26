@@ -2,7 +2,6 @@ package go_xample
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"time"
 )
@@ -52,21 +51,14 @@ func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionI
 	}
 }
 
-func (g *GoXample) CreateUser(ctx context.Context, data string) (User, error) {
+func (g *GoXample) CreateUser(ctx context.Context, user User) (User, error) {
 	select {
 	case <-ctx.Done():
 		return User{}, errors.New("Timeout")
 	default:
 	}
 
-	var user User
-
-	err := json.Unmarshal([]byte(data), &user)
-	if err != nil {
-		return User{}, err
-	}
-
-	err = g.database.InsertUser(ctx, user)
+	err := g.database.InsertUser(ctx, user)
 	if err != nil {
 		return User{}, err
 	}
@@ -97,15 +89,8 @@ func (g *GoXample) GetUserByID(ctx context.Context, id int) (User, error) {
 	return user, nil
 }
 
-func (g *GoXample) GetUserByCredential(ctx context.Context, data string) (User, error) {
-	var user User
-
-	err := json.Unmarshal([]byte(data), &user)
-	if err != nil {
-		return User{}, err
-	}
-
-	user, err = g.database.FindUserByCredential(ctx, user)
+func (g *GoXample) GetUserByCredential(ctx context.Context, user User) (User, error) {
+	user, err := g.database.FindUserByCredential(ctx, user)
 	if err != nil {
 		return User{}, err
 	}
