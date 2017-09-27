@@ -27,7 +27,7 @@ type GoXample struct {
 }
 ```
 
-The dependecies' implementation is assigned to each dependent in different package.
+The dependencies' implementation is assigned to each dependent in different package.
 
 ### Interface
 
@@ -64,14 +64,18 @@ Dependencies for GoXample are located in different packages.
 Why?
 Because dependencies are not in the project's scope. They are basically the other packages that need GoXample or are needed by GoXample. Then, it makes sense to separate dependencies package from `go_xample`.
 
-Dependecies must satisfy interface that is defined by GoXample.
+Dependencies must satisfy interface that is defined by GoXample.
 
 Why?
 As stated above, a dependency must satisfy the interface so it can be used by GoXample. This way, abstraction is clear, implementation is guided well, and contract is obvious.
 
+Since `go_xample` is the main package and the interfaces are defined in `go_xample`, dependency should import `go_xample`.
+
 ## FAQ
 
 ### Is there any guide on how to make an interface?
+
+Read [interface](https://github.com/bukalapak/go-xample/blob/master/doc/interface.md)
 
 ### What is context?
 
