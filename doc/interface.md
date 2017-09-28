@@ -73,13 +73,10 @@ Field `database` is an interface. It never say MySQL or MongoDB. So, whatever RD
 ```golang
 package main
 
-// omitted
-
 import (
   gx "github.com/bukalapak/go-xample"
   "github.com/bukalapak/go-xample/database"
 )
-
 
 func main() {
   // use MySQL
@@ -93,6 +90,13 @@ func main() {
 ```
 
 We have seen that by using interface, our code is flexible. The example proves that the code doesn't need major changes if we want to change the client.
+
+## Rule of Thumb
+
+- A method should only take 2 parameters **at most**. The first parameter is always context. The second parameter is well-defined main data. Term "should only 2 ... at most" means that it is allowed to have less than 2.
+- A method should only return 2 values **at most**. The first return value is a well-defined data. The second parameter is error. Term "should only 2 ... at most" means that it is allowed to have less than 2.
+- A method should return error as the last return value unless there is a condition that error will never occur.
+- The `DatabaseInterface` above already implements these rule of thumbs.
 
 ## Tips
 

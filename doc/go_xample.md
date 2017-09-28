@@ -79,4 +79,4 @@ Read [interface](https://github.com/bukalapak/go-xample/blob/master/doc/interfac
 
 ### What is context?
 
-### Why handler is located in different package?
+Read [context](https://github.com/bukalapak/go-xample/blob/master/doc/context.md)
