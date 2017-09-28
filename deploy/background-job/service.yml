@@ -4,7 +4,7 @@ metadata:
   name: "go-xample-background-job-{{.CurrentEnvironment}}"
 spec:
   selector:
-  	project: go-xample
+    project: go-xample
     service: background-job
     env: {{.CurrentEnvironment}}
   ports:

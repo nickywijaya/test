@@ -4,7 +4,7 @@ metadata:
   name: "go-xample-cron-job-{{.CurrentEnvironment}}"
 spec:
   selector:
-  	project: go-xample
+    project: go-xample
     service: cron-job
     env: {{.CurrentEnvironment}}
   ports:

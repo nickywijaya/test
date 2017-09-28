@@ -9,8 +9,7 @@ SERVICES ?= web background-job cron-job
 ENV      ?= default
 
 dep:
-	go get -u github.com/kardianos/govendor
-	govendor sync
+	govendor fetch -v +outside
 
 pretty:
 	# gofmt -d -w $$(find . -type f -name '*.go' -not -path "./vendor/*")

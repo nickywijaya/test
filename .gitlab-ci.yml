@@ -11,7 +11,7 @@ unit-test:
     - mkdir -p /go/src/github.com/$CI_PROJECT_NAMESPACE
     - ln -s $CI_PROJECT_DIR /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
     - cd /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-    - govendor sync
+    - make dep
   artifacts:
     untracked: false
     paths:
@@ -28,7 +28,7 @@ build-image:
     - mkdir -p /go/src/github.com/$CI_PROJECT_NAMESPACE
     - ln -s $CI_PROJECT_DIR /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
     - cd /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-    - govendor sync
+    - make dep
   artifacts:
     untracked: false
     paths:
@@ -39,7 +39,7 @@ build-image:
 
 push-image:
   stage: build
-  image: registry.bukalapak.io/sre/gudang/build/golang:0.0.2
+  image: registry.bukalapak.io/sre/gudang/build/docker:0.0.1
   dependencies:
     - build-image
   variables:
@@ -53,6 +53,17 @@ push-image:
   script:
     - make build
     - make push
+
+generate-deployment:
+  stage: build
+  image: registry.bukalapak.io/sre/gudang/build/kubelize:0.0.1
+  dependencies:
+    - build-image
+  artifacts:
+    untracked: false
+    paths:
+      - deploy/_output
+  script:
     - make deployment
 
 deploy-sandbox:
@@ -62,6 +73,7 @@ deploy-sandbox:
     - push-image
   when: manual
   script:
+    - kubectl config use-context old-cluster
     - ENV=sandbox make sandbox
 
 deploy-canary:

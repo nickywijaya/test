@@ -4,7 +4,7 @@ metadata:
   name: "go-xample-web-{{.CurrentEnvironment}}"
 spec:
   selector:
-  	project: go-xample
+    project: go-xample
     service: web
     env: {{.CurrentEnvironment}}
   ports:
