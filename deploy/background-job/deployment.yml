@@ -1,56 +1,60 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: cron-go-xample-{{.CurrentEnvironment}}
+  name: "go-xample-background-job-{{.CurrentEnvironment}}"
+  labels:
+    project: go-xample
+    service: background-job
+    env: {{.CurrentEnvironment}}
 spec:
   replicas: {{.CurrentReplica}}
   selector:
     matchLabels:
-      app: cron-go-xample
+      project: go-xample
+      service: background-job
       env: {{.CurrentEnvironment}}
   template:
     metadata:
       labels:
-        app: cron-go-xample
-        env: {{.CurrentEnvironment}}
+        project: go-xample
+        service: background-job
         release: '{{.Version}}'
+        env: {{.CurrentEnvironment}}
     spec:
       imagePullSecrets:
       - name: blregistry
       containers:
-      - name: cron-go-xample
-        image: registry.bukalapak.io/bukalapak/go-xample/cron-go-xample:{{.Version}}
+      - name: go-xample-background-job
+        image: registry.bukalapak.io/bukalapak/go-xample/background-job:{{.Version}}
         livenessProbe:
           httpGet:
             path: /healthz
-            port: 1236
+            port: 1235
           initialDelaySeconds: 30
           timeoutSeconds: 1
         readinessProbe:
           httpGet:
             path: /healthz
-            port: 1236
+            port: 1235
           timeoutSeconds: 1
         ports:
-        - containerPort: 1236
+        - containerPort: 1235
         command:
-          - /envconsul
+          - envconsul
           - -consul=127.0.0.1:8500
           - -sanitize
           - -upcase
-          - -prefix=cron-go-xample
-          - /cron-go-xample
+          - -prefix=go-xample
+          - background-job
       - name: consul
         image: registry.bukalapak.io/bukalapak/consul-image:0.0.10
         env:
         - name: SERVICE_NAME
-          value: cron-go-xample
+          value: go-xample-background-job
         - name: SERVICE_ENVIRONMENT
           value: {{.CurrentEnvironment}}
         - name: SERVICE_PORT
-          value: "1236"
-        - name: SERVICE_MONITORING_PORT
-          value: "1236"
+          value: "1235"
         - name: CONSUL1
           valueFrom:
             configMapKeyRef:
@@ -78,6 +82,6 @@ spec:
         - containerPort: 8400
         - containerPort: 8500
         - containerPort: 8600
-        command: ["/bin/entrypoint", "agent", "-config-dir=/config", "-join=$(CONSUL1)", "-join=$(CONSUL2)", "-join=$(CONSUL3)", "-encrypt=$(CONSUL_ENCRYPT)"]
+        command: [ entrypoint, agent, -config-dir=/config, -join=$(CONSUL1), -join=$(CONSUL2), -join=$(CONSUL3), -encrypt=$(CONSUL_ENCRYPT) ]
       nodeSelector:
-        env: {{.CurrentEnvironment}}
+        env: production

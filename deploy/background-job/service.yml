@@ -1,14 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: http-go-xample-{{.CurrentEnvironment}}
+  name: "go-xample-background-job-{{.CurrentEnvironment}}"
 spec:
   selector:
-    app: http-go-xample
+  	project: go-xample
+    service: background-job
     env: {{.CurrentEnvironment}}
   ports:
     - protocol: TCP
-      port: 1234
-      targetPort: 1234
+      port: 1235
+      targetPort: 1235
       nodePort: {{.NodePort}}
   type: NodePort

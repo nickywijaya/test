@@ -14,15 +14,12 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
-http-go-xample
-!http-go-xample/
-background-go-xample
-!background-go-xample/
-cron-go-xample
-!cron-go-xample/
-
-go-xample
-!go-xample/
+web
+!web/
+background-job
+!background-job/
+cron-job
+!cron-job/
 
 .env*
 

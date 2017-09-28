@@ -1,6 +1,6 @@
 projectName: go-xample
 services:
-- name: 'http-go-xample'
+- name: 'web'
   port: "1234"
   environments:
   - name: production
@@ -22,7 +22,7 @@ services:
   delay: "30"
   language: go
   consul: envconsul
-- name: 'background-go-xample'
+- name: 'background-job'
   port: "1235"
   environments:
   - name: production
@@ -44,7 +44,7 @@ services:
   delay: "30"
   language: go
   consul: envconsul
-- name: 'cron-go-xample'
+- name: 'cron-job'
   port: "1236"
   environments:
   - name: production

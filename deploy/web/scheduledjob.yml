@@ -1,0 +1,47 @@
+apiVersion: batch/v2alpha1
+kind: ScheduledJob
+metadata:
+  name: "go-xample-web-{{.CurrentEnvironment}}"
+  labels:
+    project: go-xample
+    service: web
+    env: {{.CurrentEnvironment}}
+spec:
+  schedule: 1234
+  jobTemplate:
+    spec:
+      selector:
+        matchLabels:
+          project: go-xample
+          service: web
+          env: {{.CurrentEnvironment}}
+      template:
+        metadata:
+          labels:
+            project: go-xample
+            service: web
+            release: '{{.Version}}'
+            env: {{.CurrentEnvironment}}
+        spec:
+          nodeSelector:
+            env: production
+          imagePullSecrets:
+          - name: blregistry
+          containers:
+          - name: go-xample-web
+            image: registry.bukalapak.io/bukalapak/go-xample/web:{{.Version}}
+            command:
+              - envconsul
+              - -once
+              - -consul=$(CONSUL1)
+              - -sanitize
+              - -upcase
+              - -prefix=go-xample
+              - web
+            env:
+          	- name: CONSUL
+              valueFrom:
+                configMapKeyRef:
+                  name: consul-config
+                  key: node1
+          restartPolicy: never
