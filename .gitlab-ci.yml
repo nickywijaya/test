@@ -73,7 +73,7 @@ deploy-sandbox:
     - push-image
   when: manual
   script:
-    - kubectl config use-context old-cluster
+    - kubectl config use-context staging-cluster
     - ENV=sandbox make sandbox
 
 deploy-canary:
