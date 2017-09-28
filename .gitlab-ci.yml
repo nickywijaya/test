@@ -1,76 +1,83 @@
-image: registry.bukalapak.io/bukalapak/kubernetes:latest
-
 stages:
   - test
-  - build-docker
-  - replace-sandbox
-  - create-sandbox
-  - replace-production
-  - create-production
+  - pre-build
+  - build
+  - deploy
 
-test:
+unit-test:
   stage: test
-  image: golang:1.8.1
-  services:
-    - memcached
-    - redis
-  variables:
-    GOPATH: "/go_project"
+  image: registry.bukalapak.io/sre/gudang/pre-build/golang:0.0.3
   before_script:
-    - mkdir /go_project
-    - mkdir -p $GOPATH/src/github.com/$CI_PROJECT_PATH
-    - go get -u github.com/kardianos/govendor
-    - go get -u github.com/mjibson/esc
-    - cp /go_project/bin/* /usr/local/bin/
-    - cp -Rp $CI_PROJECT_DIR/* $GOPATH/src/github.com/$CI_PROJECT_PATH
-    - cd $GOPATH/src/github.com/$CI_PROJECT_PATH
+    - mkdir -p /go/src/github.com/$CI_PROJECT_NAMESPACE
+    - ln -s $CI_PROJECT_DIR /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+    - cd /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+    - govendor sync
+  artifacts:
+    untracked: false
+    paths:
+      - deploy/_output
   script:
-    - make gen
-    - make coverage
+    - make test
 
-build-docker:
-  stage: build-docker
-  image: trihatmaja/dind:17.04-ruby2.3
+build-image:
+  stage: pre-build
+  image: registry.bukalapak.io/sre/gudang/pre-build/golang:0.0.3
+  dependencies:
+    - unit-test
+  before_script:
+    - mkdir -p /go/src/github.com/$CI_PROJECT_NAMESPACE
+    - ln -s $CI_PROJECT_DIR /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+    - cd /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+    - govendor sync
+  artifacts:
+    untracked: false
+    paths:
+      - deploy/_output
+  script:
+    - make compile
+    - make consul
+
+push-image:
+  stage: build
+  image: registry.bukalapak.io/sre/gudang/build/golang:0.0.2
+  dependencies:
+    - build-image
   variables:
     DOCKER_HOST: 172.16.8.88:2375
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - apk update && apk add git
-  script:
-    - rake aleppo:all
   artifacts:
+    untracked: false
     paths:
-    - $CI_PROJECT_DIR/deploy/_outputs/
+      - deploy/_output
+  script:
+    - make build
+    - make push
+    - make deployment
 
-replace-sandbox:
-  stage: replace-sandbox
-  script:
-    - kubectl replace -f deploy/_outputs/sandbox/aleppo-deployment-sandbox.yml --namespace default
+deploy-sandbox:
+  stage: deploy
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.1
   dependencies:
-    - build-docker
+    - push-image
   when: manual
+  script:
+    - ENV=sandbox make sandbox
 
-create-sandbox:
-  stage: create-sandbox
-  image: 
-  script:
-    - kubectl create -f deploy/_outputs/sandbox/aleppo-deployment-sandbox.yml --namespace default
+deploy-canary:
+  stage: deploy
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.1
   dependencies:
-    - build-docker
+    - push-image
   when: manual
-  
-replace-production:
-  stage: replace-production
   script:
-    - kubectl create -f deploy/_outputs/production/aleppo-deployment-production.yml --namespace default
+    - ENV=canary make canary
+
+deploy-production:
+  stage: deploy
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.1
   dependencies:
-    - build-docker
+    - push-image
   when: manual
- 
-create-production:
-  stage: create-production
   script:
-    - kubectl replace -f deploy/_outputs/production/aleppo-deployment-production.yml --namespace default
-  dependencies:
-    - build-docker
-  when: manual
+    - ENV=production make production

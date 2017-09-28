@@ -5,7 +5,7 @@ DDIR      = deploy
 ODIR      = $(DDIR)/_output
 NOCACHE   = --no-cache
 VERSION   = $(shell git show -q --format=%h)
-SERVICES ?= http-go-xample background-go-xample cron-go-xample
+SERVICES ?= web background-job cron-job
 ENV      ?= default
 
 dep:
