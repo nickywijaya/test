@@ -12,10 +12,6 @@ unit-test:
     - ln -s $CI_PROJECT_DIR /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
     - cd /go/src/github.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
     - make dep
-  artifacts:
-    untracked: false
-    paths:
-      - deploy/_output
   script:
     - make test
 
@@ -46,10 +42,6 @@ push-image:
     DOCKER_HOST: 172.16.8.88:2375
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  artifacts:
-    untracked: false
-    paths:
-      - deploy/_output
   script:
     - make build
     - make push
@@ -65,12 +57,14 @@ generate-deployment:
       - deploy/_output
   script:
     - make deployment
+    - ls deploy/_output/web
+    - ls deploy/_output/web/sandbox
 
 deploy-sandbox:
   stage: deploy
-  image: registry.bukalapak.io/sre/gudang/deployment:0.0.1
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2.1
   dependencies:
-    - push-image
+    - generate-deployment
   when: manual
   script:
     - kubectl config use-context staging-cluster
@@ -78,18 +72,18 @@ deploy-sandbox:
 
 deploy-canary:
   stage: deploy
-  image: registry.bukalapak.io/sre/gudang/deployment:0.0.1
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2.1
   dependencies:
-    - push-image
+    - generate-deployment
   when: manual
   script:
     - ENV=canary make canary
 
 deploy-production:
   stage: deploy
-  image: registry.bukalapak.io/sre/gudang/deployment:0.0.1
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2.1
   dependencies:
-    - push-image
+    - generate-deployment
   when: manual
   script:
     - ENV=production make production
