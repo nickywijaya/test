@@ -1,7 +1,7 @@
 apiVersion: batch/v2alpha1
 kind: ScheduledJob
 metadata:
-  name: "go-xample-web-{{.CurrentEnvironment}}"
+  name: go-xample-web-{{.CurrentEnvironment}}
   labels:
     project: go-xample
     service: web

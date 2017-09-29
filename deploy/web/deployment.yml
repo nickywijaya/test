@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: "go-xample-web-{{.CurrentEnvironment}}"
+  name: go-xample-web-{{.CurrentEnvironment}}
   labels:
     project: go-xample
     service: web

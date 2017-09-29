@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: "go-xample-background-job-{{.CurrentEnvironment}}"
+  name: go-xample-background-job-{{.CurrentEnvironment}}
   labels:
     project: go-xample
     service: background-job

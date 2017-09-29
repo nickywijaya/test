@@ -57,12 +57,10 @@ generate-deployment:
       - deploy/_output
   script:
     - make deployment
-    - ls deploy/_output/web
-    - ls deploy/_output/web/sandbox
 
 deploy-sandbox:
   stage: deploy
-  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2.1
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2
   dependencies:
     - generate-deployment
   when: manual
@@ -72,7 +70,7 @@ deploy-sandbox:
 
 deploy-canary:
   stage: deploy
-  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2.1
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2
   dependencies:
     - generate-deployment
   when: manual
@@ -81,7 +79,7 @@ deploy-canary:
 
 deploy-production:
   stage: deploy
-  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2.1
+  image: registry.bukalapak.io/sre/gudang/deployment:0.0.2
   dependencies:
     - generate-deployment
   when: manual

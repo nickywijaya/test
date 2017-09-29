@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "go-xample-background-job-{{.CurrentEnvironment}}"
+  name: go-xample-background-job-{{.CurrentEnvironment}}
 spec:
   selector:
     project: go-xample

@@ -1,7 +1,7 @@
 apiVersion: batch/v2alpha1
 kind: ScheduledJob
 metadata:
-  name: "go-xample-cron-job-{{.CurrentEnvironment}}"
+  name: go-xample-cron-job-{{.CurrentEnvironment}}
   labels:
     project: go-xample
     service: cron-job
