@@ -21,9 +21,9 @@ There is one main struct, in this example GoXample, to organize the service logi
 
 ```golang
 type GoXample struct {
-  database   DatabaseInterface
-  messenger  MessengerInterface
-  connection ConnectionInterface
+  database   Database
+  messenger  Messenger
+  connection Connection
 }
 ```
 
@@ -39,7 +39,7 @@ By implementing interface, the contract is clear. Client will just follow the in
 A good example is database package. It is located in folder [database](https://github.com/bukalapak/go-xample/tree/master/database). GoXample just wants to be able to store its data to database but GoXample doesn't care what RDBMS is used. It can be MySQL, MongoDB, Cassandra, Redis, or anything. Therefore, GoXample defines a contract for database. The contract contains all functionalities that  database must do.
 
 ```golang
-type DatabaseInterface interface {
+type Database interface {
   InsertUser(context.Context, User) error
   FindUserByID(context.Context, int) (User, error)
   FindUserByCredential(context.Context, User) (User, error)
@@ -49,7 +49,7 @@ type DatabaseInterface interface {
 }
 ```
 
-Any client (MySQL, MongoDB, etc) just has to satisfiy the interface so that GoXample can use it. If MySQL is needed, then we just build a MySQL client that implements all the requirements. The same thing goes with MongoDB or other RDBMS. In this project, we use MySQL and we created MySQL client in [mysql.go](https://github.com/bukalapak/go-xample/blob/master/database/mysql.go). It satisfies `DatabaseInterface` so GoXample can use it as database client.
+Any client (MySQL, MongoDB, etc) just has to satisfiy the interface so that GoXample can use it. If MySQL is needed, then we just build a MySQL client that implements all the requirements. The same thing goes with MongoDB or other RDBMS. In this project, we use MySQL and we created MySQL client in [mysql.go](https://github.com/bukalapak/go-xample/blob/master/database/mysql.go). It satisfies `Database` so GoXample can use it as database client.
 
 An advantage of using interface is it is easy to mock. We just create a mock that satisfies the interface, then, voila, we have a useful mock. The example can be found in [go_xample_mock_test.go](https://github.com/bukalapak/go-xample/blob/master/go_xample_mock_test.go)
 

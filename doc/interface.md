@@ -6,10 +6,10 @@ Interface is just a set of methods. It defines behaviours for its implementer. I
 
 ## Usage
 
-In this project, interface is used to defines dependency's behaviours. Take a look at `DatabaseInterface` below.
+In this project, interface is used to defines dependency's behaviours. Take a look at `Database` below.
 
 ```golang
-type DatabaseInterface interface {
+type Database interface {
   InsertUser(context.Context, User) error
   FindUserByID(context.Context, int) (User, error)
   FindUserByCredential(context.Context, User) (User, error)
@@ -54,21 +54,21 @@ These are the steps to define an interface:
 
 Since interface is only a set of methods, it literally does nothing. We need an implementer so it can be used. The implementer, or we should call it client, must implement all methods to satisfy the interface.
 
-In this project, we choose MySQL as RDBMS. So, all we do is create a MySQL client that satisfies GoXample's `DatabaseInterface`.
+In this project, we choose MySQL as RDBMS. So, all we do is create a MySQL client that satisfies GoXample's `Database`.
 
-If in the future we want to change RDBMS from MySQL to MongoDB, we don't need to change GoXample. That is one advantage! We only need to create MongoDB client that satisfies `DatabaseInterface`.
+If in the future we want to change RDBMS from MySQL to MongoDB, we don't need to change GoXample. That is one advantage! We only need to create MongoDB client that satisfies `Database`.
 
 Let's look at GoXample struct.
 
 ```golang
 type GoXample struct {
-  database   DatabaseInterface
-  messenger  MessengerInterface
-  connection ConnectionInterface
+  database   Database
+  messenger  Messenger
+  connection Connection
 }
 ```
 
-Field `database` is an interface. It never say MySQL or MongoDB. So, whatever RDBMS that we use, as long as it satisfies `DatabaseInterface`, it can be used in GoXample. Assuming we have MySQL client and MongoDB client that satisfy `DatabaseInterface`, the snapshot code below is valid.
+Field `database` is an interface. It never say MySQL or MongoDB. So, whatever RDBMS that we use, as long as it satisfies `Database`, it can be used in GoXample. Assuming we have MySQL client and MongoDB client that satisfy `Database`, the snapshot code below is valid.
 
 ```golang
 package main
@@ -93,10 +93,10 @@ We have seen that by using interface, our code is flexible. The example proves t
 
 ## Rule of Thumb
 
-- A method should only take 2 parameters **at most**. The first parameter is always context. The second parameter is well-defined main data. Term "should only 2 ... at most" means that it is allowed to have less than 2.
+- A method that more likely will call any dependency should only take 2 parameters **at most**. The first parameter is always context. The second parameter is well-defined main data. Term "should only 2 ... at most" means that it is allowed to have less than 2.
 - A method should only return 2 values **at most**. The first return value is a well-defined data. The second parameter is error. Term "should only 2 ... at most" means that it is allowed to have less than 2.
 - A method should return error as the last return value unless there is a condition that error will never occur.
-- The `DatabaseInterface` above already implements these rule of thumbs.
+- The `Database` above already implements these rule of thumbs.
 
 ## Tips
 

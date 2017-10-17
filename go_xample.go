@@ -12,15 +12,15 @@ import (
 // GoXample is the main struct that holds all business logic.
 // Its functions explain its service and purpose.
 type GoXample struct {
-	database   DatabaseInterface
-	messenger  MessengerInterface
-	connection ConnectionInterface
+	database   Database
+	messenger  Messenger
+	connection Connection
 }
 
-// DatabaseInterface is a contract for database client.
+// Database is a contract for database client.
 // The functions are specific.
 // They depends on GoXample's needs.
-type DatabaseInterface interface {
+type Database interface {
 	InsertUser(context.Context, User) error
 	FindUserByID(context.Context, int) (User, error)
 	FindUserByCredential(context.Context, User) (User, error)
@@ -29,17 +29,17 @@ type DatabaseInterface interface {
 	DeactivateUsers(context.Context, []User) error
 }
 
-// MessengerInterface is a contract for messenger client.
+// Messenger is a contract for messenger client.
 // The functions are specific.
 // They depends on GoXample's needs.
-type MessengerInterface interface {
+type Messenger interface {
 	PublishLoginHistory(context.Context, LoginHistory) error
 }
 
-// ConnectionInterface is a contract for third party service.
+// Connection is a contract for third party service.
 // The functions are specific.
 // They depends on GoXample's needs.
-type ConnectionInterface interface {
+type Connection interface {
 	IsEmailValid(context.Context, string) (bool, error)
 }
 
@@ -63,7 +63,7 @@ type LoginHistory struct {
 
 // NewGoXample returns a pointer of GoXample instance.
 // It takes three parameters.
-func NewGoXample(db DatabaseInterface, msgr MessengerInterface, conn ConnectionInterface) *GoXample {
+func NewGoXample(db Database, msgr Messenger, conn Connection) *GoXample {
 	return &GoXample{
 		database:   db,
 		messenger:  msgr,
