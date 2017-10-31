@@ -123,6 +123,7 @@ func NewRabbitMQ(opt RabbitMQOption) (*RabbitMQ, error) {
 // PublishLoginHistory sends LoginHistory to queue
 func (r *RabbitMQ) PublishLoginHistory(ctx context.Context, loginHistory gx.LoginHistory) error {
 	ctxMap := converter.ContextToMap(ctx)
+	ctxMap["Retry"] = int32(ctxMap["Retry"].(int))
 
 	data, err := json.Marshal(loginHistory)
 	if err != nil {
