@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bukalapak/packen/metric"
-	"github.com/bukalapak/packen/response"
 	"github.com/julienschmidt/httprouter"
 
 	gx "github.com/bukalapak/go-xample"
@@ -37,11 +35,6 @@ func NewHandler(goXample *gx.GoXample) *Handler {
 func (h *Handler) Healthz(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, "ok")
-}
-
-// Metric is used to control the flow of GET /metrics endpoint
-func (h *Handler) Metric(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	metric.Handler(w, r)
 }
 
 // CreateUser is used to control the flow of POST /users endpoint
@@ -147,11 +140,17 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request, params httprout
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	res := response.BuildError([]error{err})
-	response.Write(w, res)
+	res := fmt.Sprintf("{\"ERROR\":%s}", err.Error())
+	respWrite(w, []byte(res), 400)
 }
 
 func writeSuccess(w http.ResponseWriter, data interface{}) {
-	res := response.BuildSuccess(data, Meta{HTTPStatus: 200})
-	response.Write(w, res)
+	res, _ := json.Marshal(data)
+	respWrite(w, res, 200)
+}
+
+func respWrite(w http.ResponseWriter, res []byte, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(res)
 }
