@@ -1,22 +1,21 @@
+templateVersion: v2.2.1
 projectName: go-xample
 services:
-- name: 'web'
+- name: web
   port: "1234"
   environments:
   - name: production
     replica: "1"
-  - name: canary
-    replica: "1"
   - name: sandbox
     replica: "1"
-  - name: beta
+  - name: staging
     replica: "1"
   nodePort: "31234"
   healthz: healthz
-  maxMem: ""
-  maxCpu: ""
-  minMem: ""
-  minCpu: ""
+  maxMem: "2"
+  maxCpu: "2"
+  minMem: "0.5"
+  minCpu: "1"
   limit: false
   timeout: "1"
   delay: "30"
@@ -27,18 +26,16 @@ services:
   environments:
   - name: production
     replica: "1"
-  - name: canary
-    replica: "1"
   - name: sandbox
     replica: "1"
-  - name: beta
+  - name: staging
     replica: "1"
   nodePort: "31235"
   healthz: healthz
-  maxMem: ""
-  maxCpu: ""
-  minMem: ""
-  minCpu: ""
+  maxMem: "2"
+  maxCpu: "2"
+  minMem: "0.5"
+  minCpu: "1"
   limit: false
   timeout: "1"
   delay: "30"
@@ -49,18 +46,16 @@ services:
   environments:
   - name: production
     replica: "1"
-  - name: canary
-    replica: "1"
   - name: sandbox
     replica: "1"
-  - name: beta
+  - name: staging
     replica: "1"
   nodePort: "31236"
   healthz: healthz
-  maxMem: ""
-  maxCpu: ""
-  minMem: ""
-  minCpu: ""
+  maxMem: "2"
+  maxCpu: "2"
+  minMem: "0.5"
+  minCpu: "1"
   limit: false
   timeout: "1"
   delay: "30"
