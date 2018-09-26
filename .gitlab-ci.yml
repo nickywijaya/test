@@ -5,7 +5,9 @@ stages:
 - deployment
 
 variables:
-  VAR_KUBE_CONTEXT: $ENV
+  VAR_KUBE_CONTEXT: $ENV  
+  MODCACHEDIR: $CI_PROJECT_DIR/.gomod
+
 
 .prep-go-dir: &prep-go-dir
 - mkdir -p $MODCACHEDIR $GOPATH/pkg
