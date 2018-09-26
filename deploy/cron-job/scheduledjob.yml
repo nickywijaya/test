@@ -1,47 +1,49 @@
 apiVersion: batch/v2alpha1
 kind: ScheduledJob
 metadata:
-  name: go-xample-cron-job-{{.CurrentEnvironment}}
-  labels:
-    project: go-xample
-    service: cron-job
-    env: {{.CurrentEnvironment}}
+  annotations:
+    release: '{{.variable.VERSION}}'
+  name: {{.config.projectName}}-{{.service.name}}-{{.environment.name}}
+  namespace: {{.variable.VAR_KUBE_NAMESPACE}}
 spec:
-  schedule: '0 0 * * *'
+  schedule: "* * * * *"
   jobTemplate:
     spec:
-      selector:
-        matchLabels:
-          project: go-xample
-          service: cron-job
-          env: {{.CurrentEnvironment}}
       template:
         metadata:
+          annotations:
+            release: '{{.variable.VERSION}}'
           labels:
-            project: go-xample
-            service: cron-job
-            release: '{{.Version}}'
-            env: {{.CurrentEnvironment}}
+            project: {{.config.projectName}}
+            service: {{.service.name}}
+            env: {{.environment.name}}
         spec:
           nodeSelector:
-            env: production
+            env: {{.environment.name}}
           imagePullSecrets:
           - name: blregistry
           containers:
-          - name: go-xample-cron-job
-            image: registry.bukalapak.io/bukalapak/go-xample/cron-job:{{.Version}}
+          - name: {{.config.projectName}}-{{.service.name}}
+            image: registry.bukalapak.io/bukalapak/{{.config.projectName}}/{{.service.name}}:{{.variable.VERSION}}
+            resources:
+              limits:
+                memory: {{.service.maxMem}}Gi
+                cpu: {{.service.maxCpu}}
+              requests:
+                memory: {{.service.minMem}}Gi
+                cpu: {{.service.minCpu}}
             command:
-              - envconsul
-              - -once
-              - -consul=$(CONSUL1)
-              - -sanitize
-              - -upcase
-              - -prefix=go-xample
-              - cron-job
+            - envconsul
+            - -once
+            - -consul=$(CONSUL)
+            - -sanitize
+            - -upcase
+            - -prefix={{.variable.VAR_CONSUL_PREFIX}}
+            - {{.service.name}}
             env:
-          	- name: CONSUL
+            - name: CONSUL
               valueFrom:
                 configMapKeyRef:
                   name: consul-config
-                  key: node1
-          restartPolicy: never
+                  key: client
+          restartPolicy: Never
