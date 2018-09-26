@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bukalapak/packen/instrument"
 	"github.com/bukalapak/packen/middleware"
 	"github.com/julienschmidt/httprouter"
 	"github.com/subosito/gotenv"
@@ -53,13 +54,12 @@ func main() {
 
 	router := httprouter.New()
 	router.GET("/healthz", gxHandler.Healthz)
-	router.GET("/metrics", gxHandler.Metric)
+	router.HandlerFunc("GET", "/metrics", instrument.Handler)
 
-	router.POST("/users", middleware.MonitorHTTP("create-user", gxHandler.CreateUser))
-	router.GET("/users/:id", middleware.MonitorHTTP("get-user", gxHandler.GetUser))
+	router.POST("/users", middleware.HTTP(middleware.ApplyDecorators(gxHandler.CreateUser, middleware.WithStandardContext())))
+	router.GET("/users/:id", middleware.HTTP(middleware.ApplyDecorators(gxHandler.GetUser, middleware.WithStandardContext())))
 
-	router.POST("/login", middleware.MonitorHTTP("login", gxHandler.Login))
-	router.GET("/logout", middleware.MonitorHTTP("logout", gxHandler.Logout))
-
+	router.POST("/login", middleware.HTTP(middleware.ApplyDecorators(gxHandler.Login, middleware.WithStandardContext())))
+	router.GET("/logout", middleware.HTTP(middleware.ApplyDecorators(gxHandler.Logout, middleware.WithStandardContext())))
 	http.ListenAndServe(":1234", router)
 }

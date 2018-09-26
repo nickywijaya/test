@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bukalapak/packen/instrument"
 	"github.com/julienschmidt/httprouter"
 	"github.com/subosito/gotenv"
 
@@ -52,7 +53,7 @@ func main() {
 
 	router := httprouter.New()
 	router.GET("/healthz", gxHandler.Healthz)
-	router.GET("/metrics", gxHandler.Metric)
+	router.HandlerFunc("GET", "/metrics", instrument.Handler)
 
 	go rmq.Listen(goXample)
 
