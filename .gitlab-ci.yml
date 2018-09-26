@@ -8,13 +8,12 @@ variables:
   VAR_KUBE_CONTEXT: $ENV
 
 .prep-go-dir: &prep-go-dir
-- mkdir -p $CI_PROJECT_DIR/.depcache
-- export DEPCACHEDIR=$CI_PROJECT_DIR/.depcache
+- mkdir -p $MODCACHEDIR $GOPATH/pkg
+- ln -s $MODCACHEDIR $GOPATH/pkg/mod
 - export GO111MODULE=on
 - mkdir -p $GOPATH/src/github.com/bukalapak
 - ln -s $CI_PROJECT_DIR $GOPATH/src/github.com/bukalapak
 - cd $GOPATH/src/github.com/bukalapak/$CI_PROJECT_NAME
-- make dep
 
 test:
   stage: test
@@ -23,9 +22,9 @@ test:
   script:
   - make test
   cache:
-    key: depcache
+    key: gomod
     paths:
-    - $CI_PROJECT_DIR/.depcache
+    - $MODCACHEDIR
 
 compile:
   stage: pre-build
@@ -40,9 +39,9 @@ compile:
     paths:
     - deploy/_output
   cache:
-    key: depcache
+    key: gomod
     paths:
-    - $CI_PROJECT_DIR/.depcache
+    - $MODCACHEDIR
     policy: pull
 
 build-image:
