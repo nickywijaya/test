@@ -15,6 +15,9 @@ all: compile build push deploy
 test:
 	go test ./...
 
+mod:
+	go mod download
+
 $(ODIR):
 	@mkdir -p $(ODIR)
 
