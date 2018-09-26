@@ -15,7 +15,7 @@ variables:
 - mkdir -p $GOPATH/src/github.com/bukalapak
 - ln -s $CI_PROJECT_DIR $GOPATH/src/github.com/bukalapak
 - cd $GOPATH/src/github.com/bukalapak/$CI_PROJECT_NAME
-- make gomod
+- make mod
 
 test:
   stage: test
