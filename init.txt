@@ -1,0 +1,2 @@
+just init to git
+ini coba dari vis code
